@@ -349,16 +349,16 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
                             children: [
                               ListTile(
                                 leading: Icon(
-                                  Icons.picture_as_pdf,
+                                  Icons.qr_code,
                                   color: Theme.of(context).primaryColor,
                                 ),
                                 title: Text(
-                                  'PDF olarak indir',
+                                  'QR Kodu Okut',
                                   style: Theme.of(context).textTheme.bodyMedium,
                                 ),
                                 onTap: () {
                                   Navigator.pop(context);
-                                  // ...
+                                  context.push(Paths.qrsayfasi);
                                 },
                               ),
                               Divider(color: Theme.of(context).primaryColor),
@@ -389,6 +389,27 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
                                 onTap: () {
                                   Navigator.pop(context);
                                   // ...
+                                },
+                              ),
+                              Divider(color: Theme.of(context).primaryColor),
+                              ListTile(
+                                leading: Icon(
+                                  Icons.analytics,
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                                title: Text(
+                                  'Analiz olustur',
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                                onTap: () {
+                                  Navigator.pop(context);
+                                  context.push(
+                                    Paths.analizsayfasi,
+                                    extra: {
+                                      'baslangictarih': baslangictarih,
+                                      'bitistarih': bitistarih,
+                                    },
+                                  );
                                 },
                               ),
                             ],

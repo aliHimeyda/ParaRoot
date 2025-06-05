@@ -108,7 +108,11 @@ class _GelirGiderEkleSayfasiState extends State<GelirGiderEkleSayfasi> {
                   children: [
                     Expanded(
                       child: GestureDetector(
-                        onTap: () => setState(() => isGelir = true),
+                        onTap:
+                            () => setState(() {
+                              isGelir = true;
+                              _turController.text = '';
+                            }),
                         child: Container(
                           decoration: BoxDecoration(
                             color: isGelir ? Colors.green : Colors.transparent,
@@ -132,7 +136,11 @@ class _GelirGiderEkleSayfasiState extends State<GelirGiderEkleSayfasi> {
                     ),
                     Expanded(
                       child: GestureDetector(
-                        onTap: () => setState(() => isGelir = false),
+                        onTap:
+                            () => setState(() {
+                              isGelir = false;
+                              _turController.text = '';
+                            }),
                         child: Container(
                           decoration: BoxDecoration(
                             color: !isGelir ? Colors.red : Colors.transparent,
@@ -168,10 +176,376 @@ class _GelirGiderEkleSayfasiState extends State<GelirGiderEkleSayfasi> {
               const SizedBox(height: 12),
 
               // Tür
-              _customField(
-                hint: isGelir ? "Gelir Türü" : "Gider Türü",
-                controller: _turController,
-                isDropdown: true,
+              GestureDetector(
+                onTap: () {
+                  isGelir
+                      ? showDialog(
+                        context: context,
+                        builder:
+                            (context) => Dialog(
+                              backgroundColor:
+                                  Theme.of(context).scaffoldBackgroundColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 20.0,
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    ListTile(
+                                      title: Text(
+                                        'Maas',
+                                        style:
+                                            Theme.of(
+                                              context,
+                                            ).textTheme.bodyMedium,
+                                      ),
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                        _turController.text = 'maas';
+                                        setState(() {
+                                          _turController.text;
+                                        });
+                                      },
+                                    ),
+                                    Divider(
+                                      color: Theme.of(context).primaryColor,
+                                    ),
+                                    ListTile(
+                                      title: Text(
+                                        'Burs',
+                                        style:
+                                            Theme.of(
+                                              context,
+                                            ).textTheme.bodyMedium,
+                                      ),
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                        _turController.text = 'burs';
+                                        setState(() {
+                                          _turController.text;
+                                        });
+                                      },
+                                    ),
+                                    Divider(
+                                      color: Theme.of(context).primaryColor,
+                                    ),
+                                    ListTile(
+                                      title: Text(
+                                        'yan gelir',
+                                        style:
+                                            Theme.of(
+                                              context,
+                                            ).textTheme.bodyMedium,
+                                      ),
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                        _turController.text = 'yangelir';
+                                        setState(() {
+                                          _turController.text;
+                                        });
+                                      },
+                                    ),
+                                    Divider(
+                                      color: Theme.of(context).primaryColor,
+                                    ),
+                                    ListTile(
+                                      title: Text(
+                                        'Diger',
+                                        style:
+                                            Theme.of(
+                                              context,
+                                            ).textTheme.bodyMedium,
+                                      ),
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                        showDialog(
+                                          context: context,
+                                          builder:
+                                              (context) => Dialog(
+                                                backgroundColor:
+                                                    Theme.of(
+                                                      context,
+                                                    ).scaffoldBackgroundColor,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(16),
+                                                ),
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(
+                                                    20,
+                                                  ),
+                                                  child: Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      TextField(
+                                                        controller:
+                                                            _turController,
+                                                        decoration: InputDecoration(
+                                                          border: OutlineInputBorder(
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  10,
+                                                                ),
+                                                          ),
+                                                          contentPadding:
+                                                              const EdgeInsets.symmetric(
+                                                                horizontal: 12,
+                                                                vertical: 14,
+                                                              ),
+                                                        ),
+                                                      ),
+                                                      Align(
+                                                        alignment:
+                                                            Alignment
+                                                                .bottomCenter,
+                                                        child: TextButton(
+                                                          onPressed: () {
+                                                            Navigator.pop(
+                                                              context,
+                                                            );
+                                                            setState(() {
+                                                              _turController
+                                                                  .text;
+                                                            });
+                                                          },
+                                                          child: Text(
+                                                            'Tamam',
+                                                            style:
+                                                                Theme.of(
+                                                                      context,
+                                                                    )
+                                                                    .textTheme
+                                                                    .bodyLarge,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                      )
+                      : showDialog(
+                        context: context,
+                        builder:
+                            (context) => Dialog(
+                              backgroundColor:
+                                  Theme.of(context).scaffoldBackgroundColor,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 20.0,
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    ListTile(
+                                      title: Text(
+                                        'Kiralar',
+                                        style:
+                                            Theme.of(
+                                              context,
+                                            ).textTheme.bodyMedium,
+                                      ),
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                        _turController.text = 'kiralar';
+                                        setState(() {
+                                          _turController.text;
+                                        });
+                                      },
+                                    ),
+                                    Divider(
+                                      color: Theme.of(context).primaryColor,
+                                    ),
+                                    ListTile(
+                                      title: Text(
+                                        'Faturalar',
+                                        style:
+                                            Theme.of(
+                                              context,
+                                            ).textTheme.bodyMedium,
+                                      ),
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                        _turController.text = 'faturalar';
+                                        setState(() {
+                                          _turController.text;
+                                        });
+                                      },
+                                    ),
+                                    Divider(
+                                      color: Theme.of(context).primaryColor,
+                                    ),
+                                    ListTile(
+                                      title: Text(
+                                        'Yemek',
+                                        style:
+                                            Theme.of(
+                                              context,
+                                            ).textTheme.bodyMedium,
+                                      ),
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                        _turController.text = 'yemek';
+                                        setState(() {
+                                          _turController.text;
+                                        });
+                                      },
+                                    ),
+                                    Divider(
+                                      color: Theme.of(context).primaryColor,
+                                    ),
+                                    ListTile(
+                                      title: Text(
+                                        'Kiyafet',
+                                        style:
+                                            Theme.of(
+                                              context,
+                                            ).textTheme.bodyMedium,
+                                      ),
+                                      onTap: () {
+                                        Navigator.pop(context);
+                                        _turController.text = 'kiyafet';
+                                        setState(() {
+                                          _turController.text;
+                                        });
+                                      },
+                                    ),
+                                    Divider(
+                                      color: Theme.of(context).primaryColor,
+                                    ),
+                                    ListTile(
+                                      title: Text(
+                                        'Diger',
+                                        style:
+                                            Theme.of(
+                                              context,
+                                            ).textTheme.bodyMedium,
+                                      ),
+                                      onTap: () {
+                                        showDialog(
+                                          context: context,
+                                          builder:
+                                              (context) => Dialog(
+                                                backgroundColor:
+                                                    Theme.of(
+                                                      context,
+                                                    ).scaffoldBackgroundColor,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(16),
+                                                ),
+                                                child: Padding(
+                                                  padding: const EdgeInsets.all(
+                                                    20,
+                                                  ),
+                                                  child: Column(
+                                                    mainAxisSize:
+                                                        MainAxisSize.min,
+                                                    children: [
+                                                      TextField(
+                                                        controller:
+                                                            _turController,
+                                                        decoration: InputDecoration(
+                                                          border: OutlineInputBorder(
+                                                            borderRadius:
+                                                                BorderRadius.circular(
+                                                                  10,
+                                                                ),
+                                                          ),
+                                                          contentPadding:
+                                                              const EdgeInsets.symmetric(
+                                                                horizontal: 12,
+                                                                vertical: 14,
+                                                              ),
+                                                        ),
+                                                      ),
+                                                      Align(
+                                                        alignment:
+                                                            Alignment
+                                                                .bottomCenter,
+                                                        child: TextButton(
+                                                          onPressed: () {
+                                                            Navigator.pop(
+                                                              context,
+                                                            );
+                                                            setState(() {
+                                                              _turController
+                                                                  .text;
+                                                            });
+                                                          },
+                                                          child: Text(
+                                                            'Tamam',
+                                                            style:
+                                                                Theme.of(
+                                                                      context,
+                                                                    )
+                                                                    .textTheme
+                                                                    .bodyLarge,
+                                                          ),
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ),
+                                        );
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                      );
+                },
+                child: Container(
+                  width: MediaQuery.of(context).size.width - 20,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      width: 1,
+                      color: Theme.of(context).primaryColor,
+                    ),
+                    borderRadius: BorderRadius.all(Radius.circular(10)),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          _turController.text == ''
+                              ? isGelir
+                                  ? "Gelir Türü"
+                                  : "Gider Türü"
+                              : _turController.text,
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                        ),
+                        Icon(
+                          Icons.arrow_circle_down,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
               ),
               const SizedBox(height: 12),
 

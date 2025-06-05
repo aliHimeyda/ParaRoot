@@ -51,6 +51,11 @@ dependencies:
   http: ^1.4.0
   get_it: ^8.0.3
   flutter_launcher_icons: ^0.14.3
+  fl_chart: ^1.0.0
+  flutter_animate: ^4.5.2
+  pdf: ^3.11.3
+  printing: ^5.14.2
+  mobile_scanner: ^7.0.1
 
 dev_dependencies:
   flutter_test:

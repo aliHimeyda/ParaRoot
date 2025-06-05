@@ -25,10 +25,12 @@ class _AnasayfaState extends State<Anasayfa> {
     // Eğer ..... sayfasındaysak, BottomNavigationBar'ı gösterme
     bool showBottomNavBar =
         currentPath != Paths.loadingpage &&
+        currentPath != Paths.analizsayfasi &&
         currentPath != Paths.profilsayfasi &&
         currentPath != Paths.loginpage &&
         currentPath != Paths.hareketdetaysayfasi &&
         currentPath != Paths.gelirgidereklesayfasi &&
+        currentPath != Paths.qrsayfasi &&
         currentPath != Paths.kameracekimsayfasi; //
     return Scaffold(
       extendBody: true,

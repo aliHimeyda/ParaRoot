@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hackathon/analizsayfasi.dart';
 import 'package:hackathon/firebaseServices.dart';
 import 'package:hackathon/gelirgidereklesayfasi.dart';
 import 'package:hackathon/hareketdetaysayfasi.dart';
@@ -10,6 +11,7 @@ import 'package:hackathon/loading.dart';
 import 'package:hackathon/loginpage.dart';
 import 'package:hackathon/mainpage.dart';
 import 'package:hackathon/profilsayfasi.dart';
+import 'package:hackathon/qrsayfasi.dart';
 
 final routerkey = GlobalKey<NavigatorState>();
 
@@ -23,10 +25,8 @@ class Paths {
   static const String gelirgidereklesayfasi = '/GelirGiderEkleSayfasi';
   static const String profilsayfasi = '/profilsayfasi';
   static const String kameracekimsayfasi = '/kameracekimsayfasi';
-
-  static const String kaydedilendosyalar = '/kaydedilendosyalar';
-  static const String temizliksayfasi = '/temizliksayfasi';
-  static const String katagorikicerik = '/katagorikicerik';
+  static const String analizsayfasi = '/analizsayfasi';
+  static const String qrsayfasi = '/qrsayfasi';
 }
 
 // ignore: non_constant_identifier_names
@@ -96,6 +96,28 @@ final router = GoRouter(
             GoRoute(
               path: Paths.kameracekimsayfasi,
               builder: (context, state) => const KameraCekimSayfasi(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: Paths.qrsayfasi,
+              builder: (context, state) => const Qrsayfasi(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: Paths.analizsayfasi,
+              builder: (context, state) {
+                final tarihler = state.extra as Map<String, dynamic>;
+                return Analizsayfasi(
+                  baslangictarih: tarihler['baslangictarih'],
+                  bitistarih: tarihler['bitistarih'],
+                );
+              },
             ),
           ],
         ),

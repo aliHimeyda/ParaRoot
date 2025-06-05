@@ -31,10 +31,10 @@ class AppTheme extends ChangeNotifier {
   /// **Açık Tema (Light Mode)**
   static final ThemeData lightMode = ThemeData(
     brightness: Brightness.light, // Tema parlaklığını açık mod olarak ayarlar
-    primaryColor: AppColors.mavi, // Uygulamanın ana rengini belirler
-    secondaryHeaderColor: Color(0xFFE88D67), // turuncumsu
+    primaryColor: const Color(0xFF005C78), // Uygulamanın ana rengini belirler
+    secondaryHeaderColor: Color.fromARGB(255, 230, 234, 222), // turuncumsu
     scaffoldBackgroundColor:
-        AppColors.yesil, // Sayfanın arka plan rengini belirler
+        const Color(0xFFF3F7EC), // Sayfanın arka plan rengini belirler
 
     appBarTheme: AppBarTheme(
       backgroundColor:
@@ -149,7 +149,7 @@ class AppTheme extends ChangeNotifier {
   static final ThemeData darkMode = ThemeData(
     brightness: Brightness.dark,
     primaryColor: AppColors.sari, // Koyu mavi - Ana Renk
-    secondaryHeaderColor: Color(0xFFE88D67), // turuncumsu,
+    secondaryHeaderColor: Color.fromARGB(200, 232, 142, 103), // turuncumsu,
 
     scaffoldBackgroundColor: AppColors.siyah, // Siyah arka plan
     appBarTheme: AppBarTheme(
