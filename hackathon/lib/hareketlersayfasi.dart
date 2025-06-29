@@ -4,9 +4,12 @@ import 'package:hackathon/bilgisatiri.dart';
 import 'package:hackathon/firebaseServices.dart';
 import 'package:hackathon/hareketmodel.dart';
 import 'package:hackathon/loader.dart';
+import 'package:hackathon/main.dart';
+import 'package:hackathon/pdfislemleri.dart';
 import 'package:hackathon/router.dart';
 import 'package:hackathon/themeprovider.dart';
 import 'package:intl/intl.dart';
+import 'package:printing/printing.dart';
 import 'package:provider/provider.dart';
 
 class Hareketlersayfasi extends StatefulWidget {
@@ -17,191 +20,206 @@ class Hareketlersayfasi extends StatefulWidget {
 }
 
 class _HareketlersayfasiState extends State<Hareketlersayfasi> {
+  late List<Map<String, dynamic>?> usermoneydata = [];
   final now = DateTime.now();
   late DateTime baslangictarih = DateTime(now.year, now.month, 1);
   late DateTime bitistarih = DateTime(now.year, now.month + 1, 1);
   late int selectedIndex = 0;
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(140),
-        child: AppBar(
-          surfaceTintColor: Theme.of(context).primaryColor,
-          backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
-          elevation: 0,
-          flexibleSpace: Padding(
-            padding: const EdgeInsets.only(top: 40.0),
-            child: Column(
-              children: [
-                const SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    return Stack(
+      children: [
+        Scaffold(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          appBar: PreferredSize(
+            preferredSize: Size.fromHeight(140),
+            child: AppBar(
+              surfaceTintColor: Theme.of(context).primaryColor,
+              backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+              elevation: 0,
+              flexibleSpace: Padding(
+                padding: const EdgeInsets.only(top: 40.0),
+                child: Column(
                   children: [
-                    Column(
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Text(
-                          'Gelir',
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        SizedBox(height: 4),
-                        FutureBuilder<int>(
-                          future: getUsermoneytoplami(
-                            baslangictarih,
-                            bitistarih,
-                          ),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return Center(
-                                child: SizedBox(
-                                  width: 26,
-                                  height: 26,
-                                  child: CircularProgressIndicator(
-                                    color: Theme.of(context).primaryColor,
-                                    strokeWidth: 2,
-                                  ),
-                                ),
-                              );
-                            }
-                            if (!snapshot.hasData || snapshot.data == null) {
-                              return Text("hata");
-                            }
-                            return Text(
-                              '${snapshot.data!.toString()} TL',
-                              style: Theme.of(context).textTheme.bodyLarge,
-                            );
-                          },
-                        ),
-                      ],
-                    ),
-                    Container(
-                      height: 40,
-                      width: 1,
-                      color: Theme.of(context).primaryColor,
-                    ),
-                    Column(
-                      children: [
-                        Text(
-                          'Gider',
-                          style: Theme.of(context).textTheme.titleLarge,
-                        ),
-                        SizedBox(height: 4),
-                        FutureBuilder<int>(
-                          future: getUserborctoplami(
-                            baslangictarih,
-                            bitistarih,
-                          ),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return Center(
-                                child: SizedBox(
-                                  width: 26,
-                                  height: 26,
-                                  child: CircularProgressIndicator(
-                                    color: Theme.of(context).primaryColor,
-                                    strokeWidth: 2,
-                                  ),
-                                ),
-                              );
-                            }
-                            if (!snapshot.hasData || snapshot.data == null) {
-                              return Text("hata");
-                            }
-                            return Text(
-                              '${snapshot.data!.toString()} TL',
-                              style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 16,
-                                color: Colors.red,
+                        Column(
+                          children: [
+                            Text(
+                              'Gelir',
+                              style: Theme.of(context).textTheme.titleLarge,
+                            ),
+                            SizedBox(height: 4),
+                            FutureBuilder<int>(
+                              future: getUsermoneytoplami(
+                                baslangictarih,
+                                bitistarih,
                               ),
-                            );
-                          },
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return Center(
+                                    child: SizedBox(
+                                      width: 26,
+                                      height: 26,
+                                      child: CircularProgressIndicator(
+                                        color: Theme.of(context).primaryColor,
+                                        strokeWidth: 2,
+                                      ),
+                                    ),
+                                  );
+                                }
+                                if (!snapshot.hasData ||
+                                    snapshot.data == null) {
+                                  return Text("hata");
+                                }
+                                return Text(
+                                  '${snapshot.data!.toString()} TL',
+                                  style: Theme.of(context).textTheme.bodyLarge,
+                                );
+                              },
+                            ),
+                          ],
+                        ),
+                        Container(
+                          height: 40,
+                          width: 1,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                        Column(
+                          children: [
+                            Text(
+                              'Gider',
+                              style: Theme.of(context).textTheme.titleLarge,
+                            ),
+                            SizedBox(height: 4),
+                            FutureBuilder<int>(
+                              future: getUserborctoplami(
+                                baslangictarih,
+                                bitistarih,
+                              ),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return Center(
+                                    child: SizedBox(
+                                      width: 26,
+                                      height: 26,
+                                      child: CircularProgressIndicator(
+                                        color: Theme.of(context).primaryColor,
+                                        strokeWidth: 2,
+                                      ),
+                                    ),
+                                  );
+                                }
+                                if (!snapshot.hasData ||
+                                    snapshot.data == null) {
+                                  return Text("hata");
+                                }
+                                return Text(
+                                  '${snapshot.data!.toString()} TL',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                    color: Colors.red,
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
                         ),
                       ],
                     ),
+                    const SizedBox(height: 10),
+                    buildFilterTabs(),
                   ],
                 ),
-                const SizedBox(height: 10),
-                buildFilterTabs(),
-              ],
+              ),
             ),
           ),
-        ),
-      ),
-      body: FutureBuilder<List<Map<String, dynamic>?>>(
-        future: getUsermoneyData(baslangictarih, bitistarih),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Provider.of<Loader>(context, listen: false).loader(context);
-          }
-          if (!snapshot.hasData ||
-              snapshot.data == null ||
-              snapshot.data!.isEmpty) {
-            return icerikbossa(context);
-          }
-
-          final userinhareketdatasi = snapshot.data!;
-          return ListView.builder(
-            padding: const EdgeInsets.symmetric(horizontal: 20),
-            itemCount: userinhareketdatasi.length + 2,
-            itemBuilder: (context, index) {
-              if (index == 0) {
-                return Column(
-                  children: [
-                    Align(
-                      alignment: Alignment.topLeft,
-                      child: Text(
-                        "Hareketler",
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-                  ],
-                );
-              } else if (index == userinhareketdatasi.length + 1) {
-                return SizedBox(height: 150);
-              } else {
-                final HareketModel hareket = HareketModel(
-                  id: userinhareketdatasi[index - 1]!['ID'],
-                  tarih: userinhareketdatasi[index - 1]!['tarih'].toDate(),
-                  gidermi: userinhareketdatasi[index - 1]!['gidermi'],
-                  baslik: userinhareketdatasi[index - 1]!['baslik'],
-                  gelirTarihi:
-                      userinhareketdatasi[index - 1]!['tarih']
-                          .toDate()
-                          .toString(),
-                  gelirTuru: userinhareketdatasi[index - 1]!['gelirturu'],
-                  deger: userinhareketdatasi[index - 1]!['deger'],
-                  aciklama: userinhareketdatasi[index - 1]!['aciklama'],
-                  imageAssetPath: userinhareketdatasi[index - 1]!['imageUrl'],
-                );
-                late bool aynitarihmi = false;
-                if ((index - 2) >= 0) {
-                  if (DateFormat('d').format(
-                        userinhareketdatasi[index - 1]!['tarih'].toDate(),
-                      ) ==
-                      DateFormat('d').format(
-                        userinhareketdatasi[index - 2]!['tarih'].toDate(),
-                      )) {
-                    aynitarihmi = true;
-                  }
-                }
-                return Bilgisatiri(
-                  hareket: hareket,
-                  aynitarihmi: aynitarihmi,
-                  silmek: () async {
-                    await kayitsil(hareket);
-                    setState(() {});
-                  },
-                );
+          body: FutureBuilder<List<Map<String, dynamic>?>>(
+            future: getUsermoneyData(baslangictarih, bitistarih),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Provider.of<Loader>(
+                  context,
+                  listen: false,
+                ).loader(context);
               }
+              if (!snapshot.hasData ||
+                  snapshot.data == null ||
+                  snapshot.data!.isEmpty) {
+                return icerikbossa(context);
+              }
+
+              final userinhareketdatasi = snapshot.data!;
+              usermoneydata = userinhareketdatasi;
+              return ListView.builder(
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                itemCount: userinhareketdatasi.length + 2,
+                itemBuilder: (context, index) {
+                  if (index == 0) {
+                    return Column(
+                      children: [
+                        Align(
+                          alignment: Alignment.topLeft,
+                          child: Text(
+                            "Hareketler",
+                            style: Theme.of(context).textTheme.titleLarge,
+                          ),
+                        ),
+                        const SizedBox(height: 32),
+                      ],
+                    );
+                  } else if (index == userinhareketdatasi.length + 1) {
+                    return SizedBox(height: 150);
+                  } else {
+                    final HareketModel hareket = HareketModel(
+                      id: userinhareketdatasi[index - 1]!['ID'],
+                      tarih: userinhareketdatasi[index - 1]!['tarih'].toDate(),
+                      gidermi: userinhareketdatasi[index - 1]!['gidermi'],
+                      baslik: userinhareketdatasi[index - 1]!['baslik'],
+                      gelirTarihi:
+                          userinhareketdatasi[index - 1]!['tarih']
+                              .toDate()
+                              .toString(),
+                      gelirTuru: userinhareketdatasi[index - 1]!['gelirturu'],
+                      deger: userinhareketdatasi[index - 1]!['deger'],
+                      aciklama: userinhareketdatasi[index - 1]!['aciklama'],
+                      imageAssetPath:
+                          userinhareketdatasi[index - 1]!['imageUrl'],
+                    );
+                    late bool aynitarihmi = false;
+                    if ((index - 2) >= 0) {
+                      if (DateFormat('d').format(
+                            userinhareketdatasi[index - 1]!['tarih'].toDate(),
+                          ) ==
+                          DateFormat('d').format(
+                            userinhareketdatasi[index - 2]!['tarih'].toDate(),
+                          )) {
+                        aynitarihmi = true;
+                      }
+                    }
+                    return Bilgisatiri(
+                      hareket: hareket,
+                      aynitarihmi: aynitarihmi,
+                      silmek: () async {
+                        await kayitsil(hareket);
+                        setState(() {});
+                      },
+                    );
+                  }
+                },
+              );
             },
-          );
-        },
-      ),
+          ),
+        ),
+        getIt<Loader>().loading
+            ? Provider.of<Loader>(context, listen: false).loader(context)
+            : SizedBox(),
+      ],
     );
   }
 
@@ -514,6 +532,7 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
                     );
                   } else if (value == 'limit') {
                   } else if (value == 'paylas') {
+                    await pdfolustur();
                   } else if (value == 'analiz') {
                     context.push(
                       Paths.analizsayfasi,
@@ -530,5 +549,12 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
         ],
       ),
     );
+  }
+
+  Future<void> pdfolustur() async {
+    final pdfBytes = await Pdfislemleri.generateFaturaPdf(usermoneydata);
+
+    // Önizleme (printing)
+    await Printing.layoutPdf(onLayout: (format) async => pdfBytes);
   }
 }

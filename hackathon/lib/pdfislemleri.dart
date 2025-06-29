@@ -1,77 +1,204 @@
 import 'dart:io';
+import 'dart:typed_data';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:hackathon/loader.dart';
+import 'package:hackathon/main.dart';
+import 'package:intl/intl.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
 
 class Pdfislemleri {
+  static Future<Uint8List> generateFaturaPdf(
+    List<Map<String, dynamic>?> veriListesi, {
+    String faturaNo = "123-456-7890",
+  }) async {
+    getIt<Loader>().loading = true;
+    getIt<Loader>().change();
+    String ayYil = DateFormat('dd/mm/yyyy').format(DateTime.now()).toString();
+    final pdf = pw.Document();
+    final baseColor = PdfColor.fromHex('#005C78');
+    final accentColor = PdfColor.fromHex('#E88D67');
 
+    const rowsPerPage = 30;
+    int toplamGelir = 0;
+    int toplamGider = 0;
 
-static void createPdfFromData(DateTime tarih,String name, int age) async {
-  final pdf = pw.Document();
+    for (int i = 0; i < veriListesi.length; i += rowsPerPage) {
+      final sublist = veriListesi.sublist(
+        i,
+        (i + rowsPerPage > veriListesi.length)
+            ? veriListesi.length
+            : i + rowsPerPage,
+      );
 
- pdf.addPage(
-  pw.MultiPage(
-    build: (pw.Context context) => [
-      buildRow(context, 'label', 'value'),
-    ],
-  ),
-);
+      pdf.addPage(
+        pw.Page(
+          pageFormat: PdfPageFormat.a4,
+          build: (context) {
+            return pw.Padding(
+              padding: const pw.EdgeInsets.all(32),
+              child: pw.Column(
+                crossAxisAlignment: pw.CrossAxisAlignment.start,
+                children: [
+                  // Başlık ve bilgi kısmı
+                  pw.Row(
+                    mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+                    children: [
+                      pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.start,
+                        children: [
+                          pw.Text(
+                            "FATURA",
+                            style: pw.TextStyle(
+                              fontSize: 28,
+                              fontWeight: pw.FontWeight.bold,
+                              color: baseColor,
+                            ),
+                          ),
+                          pw.SizedBox(height: 10),
+                          pw.Text("fatura no: $faturaNo"),
+                          pw.Text("Kaynak: ParaRoot uygulamasi"),
+                        ],
+                      ),
+                      pw.Column(
+                        crossAxisAlignment: pw.CrossAxisAlignment.end,
+                        children: [
+                          pw.Text(
+                            "Olusturulma Tarihi :",
+                            style: pw.TextStyle(fontWeight: pw.FontWeight.bold),
+                          ),
+                          pw.Text(ayYil),
+                        ],
+                      ),
+                    ],
+                  ),
+                  pw.SizedBox(height: 30),
 
-  await Printing.layoutPdf(
-    onLayout: (PdfPageFormat format) async => pdf.save(),
-  );
-}
+                  // Tablo başlığı
+                  pw.Container(
+                    color: baseColor,
+                    padding: const pw.EdgeInsets.symmetric(
+                      vertical: 8,
+                      horizontal: 6,
+                    ),
+                    child: pw.Row(
+                      children: [
+                        pw.Expanded(
+                          child: pw.Text(
+                            "NO.",
+                            style: pw.TextStyle(color: PdfColors.white),
+                          ),
+                        ),
+                        pw.Expanded(
+                          flex: 3,
+                          child: pw.Text(
+                            "ACIKLAMA",
+                            style: pw.TextStyle(color: PdfColors.white),
+                          ),
+                        ),
+                        pw.Expanded(
+                          child: pw.Text(
+                            "TUR",
+                            style: pw.TextStyle(color: PdfColors.white),
+                          ),
+                        ),
+                        pw.Expanded(
+                          child: pw.Text(
+                            "PRICE",
+                            style: pw.TextStyle(color: PdfColors.white),
+                          ),
+                        ),
+                        pw.Expanded(
+                          child: pw.Text(
+                            "GUN",
+                            style: pw.TextStyle(color: PdfColors.white),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
 
-static void savePdfToFile(pw.Document pdf) async {
-  final output = await getTemporaryDirectory();
-  final file = File("${output.path}/ornek_dosya.pdf");
-  await file.writeAsBytes(await pdf.save());
-  debugPrint("PDF kaydedildi: ${file.path}");
-}
+                  // Veri satırları
+                  ...sublist.asMap().entries.map((entry) {
+                    final index = i + entry.key + 1;
+                    final item = entry.value;
+                    final tur =
+                        item!['gidermi']?.toString() == "false" ? '+' : '-';
+                    final int price = item['deger'];
 
-static pw.Widget buildRow(
-  context,
-    String label,
-    String value, {
-    bool bold = false,
-    PdfColor? color,
-    PdfColor? valueColor,
-  }) {
-    return pw.Padding(
-      padding: const pw.EdgeInsets.symmetric(vertical: 4),
-      child: pw.Row(
-        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
-        children: [
-          pw.Text(
-            label,
-            style:
-                bold
-                    ? pw.TextStyle(
-                      fontWeight: pw.FontWeight.bold,
-                      color: AppColors.mavi,
-                    )
-                    : null,
-          ),
-          pw.Text(value, style: pw.TextStyle(color: valueColor ?? color)),
-        ],
-      ),
-    );
+                    if (tur == '+') toplamGelir += price;
+                    if (tur == '-') toplamGider += price;
+
+                    return pw.Container(
+                      padding: const pw.EdgeInsets.symmetric(vertical: 4),
+                      child: pw.Row(
+                        children: [
+                          pw.Expanded(child: pw.Text(index.toString())),
+                          pw.Expanded(
+                            flex: 3,
+                            child: pw.Text(
+                              item['gelirturu'] ?? 'belirtilmemis',
+                            ),
+                          ),
+                          pw.Expanded(child: pw.Text(tur)),
+                          pw.Expanded(child: pw.Text("\$${price.toString()}")),
+                          pw.Expanded(
+                            child: pw.Text(
+                              DateFormat('d').format(
+                                item['tarih'] is Timestamp
+                                    ? (item['tarih'] as Timestamp).toDate()
+                                    : item['tarih'],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }),
+
+                  pw.Spacer(),
+
+                  if (i + rowsPerPage >=
+                      veriListesi.length) // sadece son sayfada toplamlar
+                    pw.Column(
+                      crossAxisAlignment: pw.CrossAxisAlignment.end,
+                      children: [
+                        pw.Divider(color: baseColor, thickness: 1),
+                        pw.Text(
+                          "GELIR   : \$${toplamGelir.toStringAsFixed(2)}",
+                        ),
+                        pw.Text(
+                          "GIDER   : \$${toplamGider.toStringAsFixed(2)}",
+                        ),
+                        pw.Text(
+                          "TOPLAM  : \$${(toplamGelir - toplamGider).toStringAsFixed(2)}",
+                        ),
+                        pw.SizedBox(height: 20),
+                        pw.Center(
+                          child: pw.Text(
+                            "TESEKKURLER!",
+                            style: pw.TextStyle(
+                              fontSize: 18,
+                              fontWeight: pw.FontWeight.bold,
+                              color: baseColor,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                ],
+              ),
+            );
+          },
+        ),
+      );
+    }
+    getIt<Loader>().loading = false;
+    getIt<Loader>().change();
+    return pdf.save();
   }
-}
-
-class AppColors {
-  static PdfColor mavi = PdfColor.fromInt(0xFF005C78); // Mavi
-  static PdfColor kirmizi = PdfColor.fromInt(0xFFD6453D); // Kırmızı
-  static PdfColor yesil = PdfColor.fromInt(0xFFF3F7EC); // Açık yeşilimsi beyaz
-  static PdfColor koyuMavi = PdfColor.fromInt(0xFF002B5C); // Koyu mavi
-  static PdfColor acikGri = PdfColor.fromInt(0xFFD1D1D1); // Açık gri
-  static PdfColor koyuGri = PdfColor.fromInt(0xFF505050); // Koyu gri
-  static PdfColor sari = PdfColor.fromInt(0xFFE88D67); // Sarı/turuncumsu
-  static PdfColor koyuBeyaz = PdfColor.fromInt(0xFFF2ECEC); // Açık beyaz
-  static PdfColor siyah = PdfColor.fromInt(0xFF121212); // Siyah
-  static PdfColor bordo = PdfColor.fromInt(0xFF7A1E1E); // Bordo
-  static PdfColor krem = PdfColor.fromInt(0xFFF4E1C0); // Krem
 }
