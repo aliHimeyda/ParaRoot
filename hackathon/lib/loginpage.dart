@@ -2,12 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hackathon/colors.dart';
 import 'package:hackathon/firebaseServices.dart';
-import 'package:hackathon/hareketlersayfasi.dart';
 import 'package:hackathon/loader.dart';
 import 'package:hackathon/router.dart';
-import 'package:hackathon/themeprovider.dart';
 import 'package:provider/provider.dart';
 
 class Loginpage extends StatefulWidget {

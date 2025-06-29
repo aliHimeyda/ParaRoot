@@ -23,9 +23,9 @@ class ProfilSayfasi extends StatefulWidget {
 
 class _ProfilSayfasiState extends State<ProfilSayfasi> {
   late Future<Map<String, dynamic>?> _userFuture;
-  late String? resimURL = null;
+  String? resimURL;
   late TextEditingController resim = TextEditingController();
-  late TextEditingController _telefonController = TextEditingController();
+  late final TextEditingController _telefonController = TextEditingController();
   late TextEditingController currentController = TextEditingController();
   late TextEditingController newController = TextEditingController();
   late TextEditingController email = TextEditingController();

@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -42,7 +40,7 @@ class _AnalizsayfasiState extends State<Analizsayfasi> {
           late double kiralar = 0;
           late double faturalar = 0;
           late double yemek = 0;
-          late double kiyafet = 0;
+          late double Yatirim = 0;
           late double digergider = 0;
           late double maas = 0;
           late double burs = 0;
@@ -62,9 +60,9 @@ class _AnalizsayfasiState extends State<Analizsayfasi> {
                 } else if (veri['gelirturu'] == 'yemek') {
                   toplamgider += veri['deger'];
                   yemek++;
-                } else if (veri['gelirturu'] == 'kiyafet') {
+                } else if (veri['gelirturu'] == 'Yatirim') {
                   toplamgider += veri['deger'];
-                  kiyafet++;
+                  Yatirim++;
                 } else {
                   toplamgider += veri['deger'];
                   digergider++;
@@ -146,7 +144,7 @@ class _AnalizsayfasiState extends State<Analizsayfasi> {
                                   kiralar,
                                   faturalar,
                                   yemek,
-                                  kiyafet,
+                                  Yatirim,
                                   digergider,
                                 ),
                                 SizedBox(height: 5),
@@ -160,7 +158,7 @@ class _AnalizsayfasiState extends State<Analizsayfasi> {
                                 ),
                                 SizedBox(height: 2),
                                 Text(
-                                  'Giderinizdeki artis ivmesini azaltmak icin , Diger"den gelen orani azaltmanizi oneririz',
+                                  'Giderinizdeki artis ivmesini azaltmak icin , Diger"den gelen orani azaltmanizi oneririz...\nAyrica ,Yatirima giden her kurusun gelirinize katki olarak yansiyacagini unutmayin',
                                   style: Theme.of(context).textTheme.bodyMedium,
                                 ),
                               ],
@@ -211,10 +209,10 @@ class _AnalizsayfasiState extends State<Analizsayfasi> {
     double kiralar,
     double faturalar,
     double yemek,
-    double kiyafet,
+    double Yatirim,
     double diger,
   ) {
-    double toplam = kiralar + faturalar + yemek + kiyafet + diger;
+    double toplam = kiralar + faturalar + yemek + Yatirim + diger;
     double yuzdelikbirimi = 100 / toplam;
     return Column(
       children: [
@@ -242,7 +240,7 @@ class _AnalizsayfasiState extends State<Analizsayfasi> {
                   showTitle: false,
                 ),
                 PieChartSectionData(
-                  value: kiyafet,
+                  value: Yatirim,
                   color: Color(0xFF9F2C55), // koyu kırmızı
                   showTitle: false,
                 ),
@@ -334,11 +332,11 @@ class _AnalizsayfasiState extends State<Analizsayfasi> {
                   Column(
                     children: [
                       Text(
-                        'kiyafet',
+                        'Yatirim',
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                       Text(
-                        '${(yuzdelikbirimi * kiyafet).toStringAsFixed(1)}%',
+                        '${(yuzdelikbirimi * Yatirim).toStringAsFixed(1)}%',
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                     ],

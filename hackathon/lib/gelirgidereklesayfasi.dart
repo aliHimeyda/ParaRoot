@@ -21,7 +21,7 @@ class GelirGiderEkleSayfasi extends StatefulWidget {
 }
 
 class _GelirGiderEkleSayfasiState extends State<GelirGiderEkleSayfasi> {
-  late String? resimURL = null;
+  String? resimURL;
   bool isGelir = true;
   DateTime selectedDate = DateTime.now();
   final TextEditingController _dateController = TextEditingController();
@@ -411,7 +411,7 @@ class _GelirGiderEkleSayfasiState extends State<GelirGiderEkleSayfasi> {
                                     ),
                                     ListTile(
                                       title: Text(
-                                        'Kiyafet',
+                                        'Yatirim',
                                         style:
                                             Theme.of(
                                               context,
@@ -419,7 +419,7 @@ class _GelirGiderEkleSayfasiState extends State<GelirGiderEkleSayfasi> {
                                       ),
                                       onTap: () {
                                         Navigator.pop(context);
-                                        _turController.text = 'kiyafet';
+                                        _turController.text = 'Yatirim';
                                         setState(() {
                                           _turController.text;
                                         });
@@ -437,6 +437,7 @@ class _GelirGiderEkleSayfasiState extends State<GelirGiderEkleSayfasi> {
                                             ).textTheme.bodyMedium,
                                       ),
                                       onTap: () {
+                                        Navigator.pop(context);
                                         showDialog(
                                           context: context,
                                           builder:

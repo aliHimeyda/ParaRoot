@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hackathon/bilgisatiri.dart';
-import 'package:hackathon/colors.dart';
 import 'package:hackathon/firebaseServices.dart';
 import 'package:hackathon/hareketmodel.dart';
 import 'package:hackathon/loader.dart';
 import 'package:hackathon/router.dart';
 import 'package:hackathon/themeprovider.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class Hareketlersayfasi extends StatefulWidget {
@@ -165,6 +165,7 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
                 return SizedBox(height: 150);
               } else {
                 final HareketModel hareket = HareketModel(
+                  id: userinhareketdatasi[index - 1]!['ID'],
                   tarih: userinhareketdatasi[index - 1]!['tarih'].toDate(),
                   gidermi: userinhareketdatasi[index - 1]!['gidermi'],
                   baslik: userinhareketdatasi[index - 1]!['baslik'],
@@ -177,14 +178,25 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
                   aciklama: userinhareketdatasi[index - 1]!['aciklama'],
                   imageAssetPath: userinhareketdatasi[index - 1]!['imageUrl'],
                 );
-                late bool aynitarihmi = true;
+                late bool aynitarihmi = false;
                 if ((index - 2) >= 0) {
-                  if (userinhareketdatasi[index - 1]!['tarih'].toDate() ==
-                      userinhareketdatasi[index - 2]!['tarih'].toDate()) {
-                    aynitarihmi = false;
+                  if (DateFormat('d').format(
+                        userinhareketdatasi[index - 1]!['tarih'].toDate(),
+                      ) ==
+                      DateFormat('d').format(
+                        userinhareketdatasi[index - 2]!['tarih'].toDate(),
+                      )) {
+                    aynitarihmi = true;
                   }
                 }
-                return Bilgisatiri(hareket: hareket, aynitarihmi: aynitarihmi);
+                return Bilgisatiri(
+                  hareket: hareket,
+                  aynitarihmi: aynitarihmi,
+                  silmek: () async {
+                    await kayitsil(hareket);
+                    setState(() {});
+                  },
+                );
               }
             },
           );
@@ -329,95 +341,190 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
                 bottomRight: Radius.circular(12),
               ),
             ),
-            child: IconButton(
-              icon: const Icon(Icons.more_horiz),
-              color: Theme.of(context).primaryColor,
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder:
-                      (context) => Dialog(
-                        backgroundColor:
-                            Theme.of(context).scaffoldBackgroundColor,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(vertical: 20.0),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              ListTile(
-                                leading: Icon(
-                                  Icons.qr_code,
-                                  color: Theme.of(context).primaryColor,
-                                ),
-                                title: Text(
-                                  'QR Kodu Okut',
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                ),
-                                onTap: () {
-                                  Navigator.pop(context);
-                                  context.push(Paths.qrsayfasi);
-                                },
-                              ),
-                              Divider(color: Theme.of(context).primaryColor),
-                              ListTile(
-                                leading: Icon(
-                                  Icons.delete_forever,
-                                  color: Theme.of(context).primaryColor,
-                                ),
-                                title: Text(
-                                  'Tüm kayıtları sil',
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                ),
-                                onTap: () {
-                                  Navigator.pop(context);
-                                  // ...
-                                },
-                              ),
-                              Divider(color: Theme.of(context).primaryColor),
-                              ListTile(
-                                leading: Icon(
-                                  Icons.share,
-                                  color: Theme.of(context).primaryColor,
-                                ),
-                                title: Text(
-                                  'Verileri paylaş',
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                ),
-                                onTap: () {
-                                  Navigator.pop(context);
-                                  // ...
-                                },
-                              ),
-                              Divider(color: Theme.of(context).primaryColor),
-                              ListTile(
-                                leading: Icon(
-                                  Icons.analytics,
-                                  color: Theme.of(context).primaryColor,
-                                ),
-                                title: Text(
-                                  'Analiz olustur',
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                ),
-                                onTap: () {
-                                  Navigator.pop(context);
-                                  context.push(
-                                    Paths.analizsayfasi,
-                                    extra: {
-                                      'baslangictarih': baslangictarih,
-                                      'bitistarih': bitistarih,
-                                    },
-                                  );
-                                },
-                              ),
-                            ],
-                          ),
+            child: Theme(
+              data: Theme.of(context).copyWith(
+                popupMenuTheme: PopupMenuThemeData(
+                  color:
+                      Theme.of(
+                        context,
+                      ).scaffoldBackgroundColor, // Menü arka planı
+                ),
+              ),
+              child: PopupMenuButton<String>(
+                icon: Icon(
+                  Icons.more_vert,
+                  color: Theme.of(context).primaryColor,
+                ),
+                itemBuilder:
+                    (context) => [
+                      PopupMenuItem(
+                        value: 'hatirlatici',
+                        padding: EdgeInsets.only(left: 20, right: 20),
+                        child: Row(
+                          spacing: 5,
+                          children: [
+                            Icon(
+                              Icons.alarm,
+                              color: Theme.of(context).primaryColor,
+                            ),
+
+                            Text(
+                              'Hatirlatici',
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ],
                         ),
                       ),
-                );
-              },
+                      PopupMenuItem(
+                        value: 'limit',
+                        padding: EdgeInsets.only(left: 20, right: 20),
+                        child: Row(
+                          spacing: 5,
+                          children: [
+                            Icon(
+                              Icons.block,
+                              color: Theme.of(context).primaryColor,
+                            ),
+
+                            Text(
+                              'Limit Ekle',
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem(
+                        padding: EdgeInsets.only(left: 20, right: 20),
+                        value: 'sil',
+                        child: Row(
+                          spacing: 5,
+                          children: [
+                            Icon(
+                              Icons.delete_forever,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                            Text(
+                              'Tüm kayıtları sil',
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem(
+                        padding: EdgeInsets.only(left: 20, right: 20),
+                        value: 'paylas',
+                        child: Row(
+                          spacing: 5,
+                          children: [
+                            Icon(
+                              Icons.share,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                            Text(
+                              'Verileri paylaş',
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ],
+                        ),
+                      ),
+                      PopupMenuItem(
+                        padding: EdgeInsets.only(left: 20, right: 20),
+                        value: 'analiz',
+                        child: Row(
+                          spacing: 5,
+                          children: [
+                            Icon(
+                              Icons.analytics,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                            Text(
+                              'Analiz olustur',
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                onSelected: (value) async {
+                  if (value == 'hatirlatici') {
+                  } else if (value == 'sil') {
+                    showDialog(
+                      context: context,
+                      builder:
+                          (context) => Dialog(
+                            backgroundColor:
+                                Theme.of(context).scaffoldBackgroundColor,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(20),
+                              child: Column(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Center(
+                                    child: Text(
+                                      '${DateFormat('dd/mm/yyyy').format(baslangictarih)}-${DateFormat('dd/mm/yyyy').format(bitistarih)} arasi kayitlar silinecektir ,\nonayliyor musunuz?',
+                                      style:
+                                          Theme.of(
+                                            context,
+                                          ).textTheme.bodyMedium,
+                                    ),
+                                  ),
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      TextButton(
+                                        onPressed: () {
+                                          Navigator.pop(context);
+                                        },
+                                        child: Text(
+                                          'Iptal',
+
+                                          style:
+                                              Theme.of(
+                                                context,
+                                              ).textTheme.bodyMedium,
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () async {
+                                          await tumkayitlarisil(
+                                            baslangictarih,
+                                            bitistarih,
+                                          );
+                                          Navigator.pop(context);
+                                          setState(() {});
+                                        },
+                                        child: Text(
+                                          'Devam',
+                                          style:
+                                              Theme.of(
+                                                context,
+                                              ).textTheme.bodyMedium,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                    );
+                  } else if (value == 'limit') {
+                  } else if (value == 'paylas') {
+                  } else if (value == 'analiz') {
+                    context.push(
+                      Paths.analizsayfasi,
+                      extra: {
+                        'baslangictarih': baslangictarih,
+                        'bitistarih': bitistarih,
+                      },
+                    );
+                  }
+                },
+              ),
             ),
           ),
         ],

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class Profilmodel with ChangeNotifier {
-  late String? kamerailecekilenresimlinki = null;
+  String? kamerailecekilenresimlinki;
   late Map<String, dynamic> currentuser;
   void guncelle() {
     notifyListeners();

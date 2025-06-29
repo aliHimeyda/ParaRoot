@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hackathon/analizsayfasi.dart';
-import 'package:hackathon/firebaseServices.dart';
 import 'package:hackathon/gelirgidereklesayfasi.dart';
 import 'package:hackathon/hareketdetaysayfasi.dart';
 import 'package:hackathon/hareketlersayfasi.dart';

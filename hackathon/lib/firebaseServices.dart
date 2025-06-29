@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:hackathon/hareketmodel.dart';
 import 'package:hackathon/loader.dart';
 import 'package:hackathon/main.dart';
 import 'package:http/http.dart' as http;
@@ -26,12 +27,12 @@ Future<Map<String, dynamic>?> getUserData() async {
   final querySnapshot =
       await FirebaseFirestore.instance
           .collection('kullanicibilgileri')
-          .where('ID', isEqualTo: uid)
+          .doc(uid)
           .get();
 
-  if (querySnapshot.docs.isNotEmpty) {
-    debugPrint(querySnapshot.docs.first.data().toString());
-    return querySnapshot.docs.first.data();
+  if (querySnapshot.exists) {
+    debugPrint(querySnapshot.data().toString());
+    return querySnapshot.data();
   } else {
     return null;
   }
@@ -42,11 +43,11 @@ Future<Map<String, dynamic>?> changeUserData() async {
   final querySnapshot =
       await FirebaseFirestore.instance
           .collection('kullanicibilgileri')
-          .where('ID', isEqualTo: uid)
+          .doc(uid)
           .get();
 
-  if (querySnapshot.docs.isNotEmpty) {
-    return querySnapshot.docs.first.data();
+  if (querySnapshot.exists) {
+    return querySnapshot.data();
   } else {
     return null;
   }
@@ -102,6 +103,47 @@ Future<int> getUsermoneytoplami(
   return toplamgelir;
 }
 
+Future<void> tumkayitlarisil( DateTime baslangictarih,
+  DateTime bitistarih,) async {
+  getIt<Loader>().loading = true;
+  getIt<Loader>().change();
+  final uid = FirebaseAuth.instance.currentUser!.uid;
+  final querySnapshot =
+      await FirebaseFirestore.instance
+          .collection('gelirgidertablosu')
+          .where('ID', isEqualTo: uid)
+          .where('tarih', isGreaterThanOrEqualTo: baslangictarih)
+          .where('tarih', isLessThan: bitistarih)
+          .orderBy('tarih', descending: true)
+          .get();
+
+  for (var doc in querySnapshot.docs) {
+    await doc.reference.delete();
+  }
+  getIt<Loader>().loading = false;
+  getIt<Loader>().change();
+}
+
+Future<void> kayitsil(HareketModel hareket) async {
+  getIt<Loader>().loading = true;
+  getIt<Loader>().change();
+  final uid = FirebaseAuth.instance.currentUser!.uid;
+  final querySnapshot =
+      await FirebaseFirestore.instance
+          .collection('gelirgidertablosu')
+          .where('ID', isEqualTo: uid)
+          .where('aciklama', isEqualTo: hareket.aciklama)
+          .where('baslik', isEqualTo: hareket.baslik)
+          .where('deger', isEqualTo: hareket.deger)
+          .get();
+
+  for (var doc in querySnapshot.docs) {
+    await doc.reference.delete();
+  }
+  getIt<Loader>().loading = false;
+  getIt<Loader>().change();
+}
+
 Future<int> getUserborctoplami(
   DateTime baslangictarih,
   DateTime bitistarih,
@@ -155,6 +197,7 @@ Future<UserCredential?> signInWithGoogle() async {
     final user = userCredential.user;
 
     if (user != null) {
+      debugPrint('kosula giris yapildi ------------------------');
       Firebaseservices.currentuser = user;
       Firebaseservices.isloading = true;
 
@@ -164,6 +207,9 @@ Future<UserCredential?> signInWithGoogle() async {
               .doc(user.uid)
               .get();
 
+      debugPrint(
+        ' giris bilgileri alindi ve giris yapildi ------------------------',
+      );
       // Eğer kullanıcı Firestore’da kayıtlı değilse, ekle
       if (!userDoc.exists) {
         await FirebaseFirestore.instance
@@ -193,8 +239,8 @@ Future<UserCredential?> signInWithGoogle() async {
 }
 
 Future<String?> resimYukleVeLinkAl() async {
-  final ImagePicker _picker = ImagePicker();
-  final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
+  final ImagePicker picker = ImagePicker();
+  final XFile? image = await picker.pickImage(source: ImageSource.gallery);
   getIt<Loader>().loading = true;
   getIt<Loader>().change();
   if (image == null) return null;

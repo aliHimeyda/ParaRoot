@@ -1,14 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hackathon/firebaseServices.dart';
 import 'package:hackathon/hareketmodel.dart';
 import 'package:hackathon/router.dart';
+import 'package:hackathon/themeprovider.dart';
 import 'package:intl/intl.dart';
 
 class Bilgisatiri extends StatelessWidget {
+  final VoidCallback silmek;
   final HareketModel hareket;
   final bool aynitarihmi;
   const Bilgisatiri({
     super.key,
+    required this.silmek,
     required this.hareket,
     required this.aynitarihmi,
   });
@@ -31,11 +35,10 @@ class Bilgisatiri extends StatelessWidget {
     required BuildContext context,
   }) {
     String tutar =
-        hareket.gidermi
-            ? '-' + hareket.deger.toString() + 'TL'
-            : '+' + hareket.deger.toString() + 'TL';
+        hareket.gidermi ? '-${hareket.deger}TL' : '+${hareket.deger}TL';
     String gun = DateFormat('d').format(hareket.tarih);
     String ay = DateFormat('MMM', 'tr_TR').format(hareket.tarih).toUpperCase();
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -43,7 +46,7 @@ class Bilgisatiri extends StatelessWidget {
         SizedBox(
           width: 50,
           child:
-              aynitarihmi
+              !aynitarihmi
                   ? Column(
                     children: [
                       Text(gun, style: Theme.of(context).textTheme.titleLarge),
@@ -84,15 +87,24 @@ class Bilgisatiri extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            GestureDetector(
-              onTap: () {
-                context.push(Paths.hareketdetaysayfasi, extra: hareket);
-              },
-              child: Icon(
-                Icons.notes,
-                size: 20,
-                color: Theme.of(context).iconTheme.color,
-              ),
+            Row(
+              spacing: 4,
+              children: [
+                GestureDetector(
+                  onTap: () {
+                    context.push(Paths.hareketdetaysayfasi, extra: hareket);
+                  },
+                  child: Icon(
+                    Icons.notes,
+                    size: 20,
+                    color: Theme.of(context).iconTheme.color,
+                  ),
+                ),
+                GestureDetector(
+                  onTap: silmek,
+                  child: Icon(Icons.delete, size: 20, color: AppColors.kirmizi),
+                ),
+              ],
             ),
           ],
         ),

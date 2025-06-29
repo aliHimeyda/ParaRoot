@@ -1,6 +1,5 @@
-import 'package:intl/intl.dart';
-
 class HareketModel {
+  final String id;
   final DateTime tarih;
   final bool gidermi;
   final String baslik;
@@ -11,6 +10,7 @@ class HareketModel {
   final String imageAssetPath;
 
   HareketModel({
+    required this.id,
     required this.tarih,
     required this.gidermi,
     required this.baslik,

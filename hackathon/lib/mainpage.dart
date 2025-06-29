@@ -43,8 +43,8 @@ class _AnasayfaState extends State<Anasayfa> {
 
                 backgroundColor:
                     Theme.of(context).floatingActionButtonTheme.backgroundColor,
-                child: const Icon(Icons.add, color: Colors.white, size: 32),
                 shape: const CircleBorder(),
+                child: const Icon(Icons.add, color: Colors.white, size: 32),
               )
               : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,

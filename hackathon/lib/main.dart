@@ -2,11 +2,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:hackathon/loader.dart';
-import 'package:hackathon/loading.dart';
 import 'package:hackathon/profilmodel.dart';
 import 'package:hackathon/router.dart';
 import 'package:hackathon/themeprovider.dart';
-import 'package:http/http.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 

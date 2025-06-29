@@ -1,4 +1,3 @@
-import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:hackathon/hareketmodel.dart';
@@ -11,6 +10,7 @@ class HareketDetaySayfasi extends StatelessWidget {
   Widget build(BuildContext context) {
     final List<HareketModel> hareketler = [
       HareketModel(
+        id: detaynesnesi.id,
         tarih: DateTime(12, 3, 2025),
         gidermi: false,
         baslik: detaynesnesi.baslik,

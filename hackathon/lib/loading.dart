@@ -1,15 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hackathon/colors.dart';
 import 'package:hackathon/firebaseServices.dart';
-import 'package:hackathon/hareketlersayfasi.dart';
-import 'package:hackathon/loader.dart';
 import 'package:hackathon/router.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:hackathon/themeprovider.dart';
-import 'package:loading_animation_widget/loading_animation_widget.dart';
-import 'package:provider/provider.dart';
 
 class LoadingPage extends StatefulWidget {
   const LoadingPage({super.key});

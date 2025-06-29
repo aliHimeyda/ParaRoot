@@ -23,7 +23,7 @@ class KameraCekimSayfasi extends StatefulWidget {
 
 class _KameraCekimSayfasiState extends State<KameraCekimSayfasi> {
   final TextEditingController _resimYoluController = TextEditingController();
-  late String? resimURL = null;
+  String? resimURL;
   CameraController? _cameraController;
   bool _isFlashOn = false;
   List<CameraDescription>? _cameras;
