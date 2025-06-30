@@ -110,13 +110,7 @@ final router = GoRouter(
           routes: [
             GoRoute(
               path: Paths.analizsayfasi,
-              builder: (context, state) {
-                final tarihler = state.extra as Map<String, dynamic>;
-                return Analizsayfasi(
-                  baslangictarih: tarihler['baslangictarih'],
-                  bitistarih: tarihler['bitistarih'],
-                );
-              },
+              builder: (context, state) => const Analizsayfasi(),
             ),
           ],
         ),

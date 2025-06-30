@@ -5,15 +5,12 @@ import 'package:go_router/go_router.dart';
 import 'package:hackathon/firebaseServices.dart';
 import 'package:hackathon/loader.dart';
 import 'package:hackathon/router.dart';
+import 'package:hackathon/veriprovider.dart';
 import 'package:provider/provider.dart';
 
 class Analizsayfasi extends StatefulWidget {
-  final DateTime baslangictarih;
-  final DateTime bitistarih;
   const Analizsayfasi({
     super.key,
-    required this.baslangictarih,
-    required this.bitistarih,
   });
 
   @override
@@ -23,21 +20,7 @@ class Analizsayfasi extends StatefulWidget {
 class _AnalizsayfasiState extends State<Analizsayfasi> {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body: FutureBuilder(
-        future: getUsermoneyData(widget.baslangictarih, widget.bitistarih),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Provider.of<Loader>(context, listen: false).loader(context);
-          }
-          if (!snapshot.hasData ||
-              snapshot.data == null ||
-              snapshot.data!.isEmpty) {
-            return icerikbossa(context);
-          }
-          final List<Map<String, dynamic>?> gelenveriler = snapshot.data!;
-          late double kiralar = 0;
+    late double kiralar = 0;
           late double faturalar = 0;
           late double yemek = 0;
           late double Yatirim = 0;
@@ -48,8 +31,8 @@ class _AnalizsayfasiState extends State<Analizsayfasi> {
           late double digergelir = 0;
           late double toplamgelir = 0;
           late double toplamgider = 0;
-          if (gelenveriler.isNotEmpty) {
-            for (Map<String, dynamic>? veri in gelenveriler) {
+          if (context.watch<Veriprovider>().veri.isNotEmpty) {
+            for (Map<String, dynamic>? veri in context.watch<Veriprovider>().veri) {
               if (veri!['gidermi']) {
                 if (veri['gelirturu'] == 'kiralar') {
                   kiralar++;
@@ -84,7 +67,9 @@ class _AnalizsayfasiState extends State<Analizsayfasi> {
               }
             }
           }
-          return Padding(
+    return Scaffold(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      body:  Padding(
             padding: const EdgeInsets.only(top: 12),
             child: ListView(
               children: [
@@ -171,9 +156,7 @@ class _AnalizsayfasiState extends State<Analizsayfasi> {
                 ),
               ],
             ),
-          );
-        },
-      ),
+          ),
     );
   }
 

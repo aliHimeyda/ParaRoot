@@ -8,6 +8,7 @@ import 'package:hackathon/main.dart';
 import 'package:hackathon/pdfislemleri.dart';
 import 'package:hackathon/router.dart';
 import 'package:hackathon/themeprovider.dart';
+import 'package:hackathon/veriprovider.dart';
 import 'package:intl/intl.dart';
 import 'package:printing/printing.dart';
 import 'package:provider/provider.dart';
@@ -25,6 +26,26 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
   late DateTime baslangictarih = DateTime(now.year, now.month, 1);
   late DateTime bitistarih = DateTime(now.year, now.month + 1, 1);
   late int selectedIndex = 0;
+  late Future<void> getveries;
+
+  @override
+  void initState() {
+    super.initState();
+    getveries = getVeries();
+  }
+
+  Future<void> getVeries() async {
+    await Provider.of<Veriprovider>(
+      context,
+      listen: false,
+    ).getusermoneytoplami();
+    await Provider.of<Veriprovider>(
+      context,
+      listen: false,
+    ).getuserborctoplami();
+    await Provider.of<Veriprovider>(context, listen: false).getusermoneydata();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -52,34 +73,9 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
                             SizedBox(height: 4),
-                            FutureBuilder<int>(
-                              future: getUsermoneytoplami(
-                                baslangictarih,
-                                bitistarih,
-                              ),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return Center(
-                                    child: SizedBox(
-                                      width: 26,
-                                      height: 26,
-                                      child: CircularProgressIndicator(
-                                        color: Theme.of(context).primaryColor,
-                                        strokeWidth: 2,
-                                      ),
-                                    ),
-                                  );
-                                }
-                                if (!snapshot.hasData ||
-                                    snapshot.data == null) {
-                                  return Text("hata");
-                                }
-                                return Text(
-                                  '${snapshot.data!.toString()} TL',
-                                  style: Theme.of(context).textTheme.bodyLarge,
-                                );
-                              },
+                            Text(
+                              '${context.watch<Veriprovider>().gelirtoplami.toString()} TL',
+                              style: Theme.of(context).textTheme.bodyLarge,
                             ),
                           ],
                         ),
@@ -95,38 +91,13 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
                               style: Theme.of(context).textTheme.titleLarge,
                             ),
                             SizedBox(height: 4),
-                            FutureBuilder<int>(
-                              future: getUserborctoplami(
-                                baslangictarih,
-                                bitistarih,
+                            Text(
+                              '${context.watch<Veriprovider>().borctoplami.toString()} TL',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 16,
+                                color: Colors.red,
                               ),
-                              builder: (context, snapshot) {
-                                if (snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                                  return Center(
-                                    child: SizedBox(
-                                      width: 26,
-                                      height: 26,
-                                      child: CircularProgressIndicator(
-                                        color: Theme.of(context).primaryColor,
-                                        strokeWidth: 2,
-                                      ),
-                                    ),
-                                  );
-                                }
-                                if (!snapshot.hasData ||
-                                    snapshot.data == null) {
-                                  return Text("hata");
-                                }
-                                return Text(
-                                  '${snapshot.data!.toString()} TL',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 16,
-                                    color: Colors.red,
-                                  ),
-                                );
-                              },
                             ),
                           ],
                         ),
@@ -139,8 +110,8 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
               ),
             ),
           ),
-          body: FutureBuilder<List<Map<String, dynamic>?>>(
-            future: getUsermoneyData(baslangictarih, bitistarih),
+          body: FutureBuilder<void>(
+            future: getveries,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return Provider.of<Loader>(
@@ -148,17 +119,15 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
                   listen: false,
                 ).loader(context);
               }
-              if (!snapshot.hasData ||
-                  snapshot.data == null ||
-                  snapshot.data!.isEmpty) {
+              if (!context.watch<Veriprovider>().veri.isNotEmpty ||
+                  context.watch<Veriprovider>().veri == [] ||
+                  context.watch<Veriprovider>().veri.isEmpty) {
                 return icerikbossa(context);
               }
 
-              final userinhareketdatasi = snapshot.data!;
-              usermoneydata = userinhareketdatasi;
               return ListView.builder(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                itemCount: userinhareketdatasi.length + 2,
+                itemCount: context.watch<Veriprovider>().veri.length + 2,
                 itemBuilder: (context, index) {
                   if (index == 0) {
                     return Column(
@@ -173,31 +142,55 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
                         const SizedBox(height: 32),
                       ],
                     );
-                  } else if (index == userinhareketdatasi.length + 1) {
+                  } else if (index ==
+                      context.watch<Veriprovider>().veri.length + 1) {
                     return SizedBox(height: 150);
                   } else {
                     final HareketModel hareket = HareketModel(
-                      id: userinhareketdatasi[index - 1]!['ID'],
-                      tarih: userinhareketdatasi[index - 1]!['tarih'].toDate(),
-                      gidermi: userinhareketdatasi[index - 1]!['gidermi'],
-                      baslik: userinhareketdatasi[index - 1]!['baslik'],
+                      id: context.watch<Veriprovider>().veri[index - 1]!['ID'],
+                      tarih:
+                          context
+                              .watch<Veriprovider>()
+                              .veri[index - 1]!['tarih']
+                              .toDate(),
+                      gidermi:
+                          context.watch<Veriprovider>().veri[index -
+                              1]!['gidermi'],
+                      baslik:
+                          context.watch<Veriprovider>().veri[index -
+                              1]!['baslik'],
                       gelirTarihi:
-                          userinhareketdatasi[index - 1]!['tarih']
+                          context
+                              .watch<Veriprovider>()
+                              .veri[index - 1]!['tarih']
                               .toDate()
                               .toString(),
-                      gelirTuru: userinhareketdatasi[index - 1]!['gelirturu'],
-                      deger: userinhareketdatasi[index - 1]!['deger'],
-                      aciklama: userinhareketdatasi[index - 1]!['aciklama'],
+                      gelirTuru:
+                          context.watch<Veriprovider>().veri[index -
+                              1]!['gelirturu'],
+                      deger:
+                          context.watch<Veriprovider>().veri[index -
+                              1]!['deger'],
+                      aciklama:
+                          context.watch<Veriprovider>().veri[index -
+                              1]!['aciklama'],
                       imageAssetPath:
-                          userinhareketdatasi[index - 1]!['imageUrl'],
+                          context.watch<Veriprovider>().veri[index -
+                              1]!['imageUrl'],
                     );
                     late bool aynitarihmi = false;
                     if ((index - 2) >= 0) {
                       if (DateFormat('d').format(
-                            userinhareketdatasi[index - 1]!['tarih'].toDate(),
+                            context
+                                .watch<Veriprovider>()
+                                .veri[index - 1]!['tarih']
+                                .toDate(),
                           ) ==
                           DateFormat('d').format(
-                            userinhareketdatasi[index - 2]!['tarih'].toDate(),
+                            context
+                                .watch<Veriprovider>()
+                                .veri[index - 2]!['tarih']
+                                .toDate(),
                           )) {
                         aynitarihmi = true;
                       }
@@ -216,7 +209,7 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
             },
           ),
         ),
-        getIt<Loader>().loading
+        context.watch<Loader>().loading
             ? Provider.of<Loader>(context, listen: false).loader(context)
             : SizedBox(),
       ],
@@ -287,23 +280,51 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
             final bool isSelected = selectedIndex == index;
             return Expanded(
               child: GestureDetector(
-                onTap: () {
-                  setState(() {
-                    final now = DateTime.now();
+                onTap: () async {
+                  final now = DateTime.now();
 
-                    if (index == 0) {
-                      // Bu ay
-                      baslangictarih = DateTime(now.year, now.month, 1);
-                      bitistarih = DateTime(now.year, now.month + 1, 1);
-                    } else if (index == 1) {
-                      // Geçen ay
-                      baslangictarih = DateTime(now.year, now.month - 1, 1);
-                      bitistarih = DateTime(now.year, now.month, 1);
-                    } else {
-                      // Son 3 ay
-                      baslangictarih = DateTime(now.year, now.month - 2, 1);
-                      bitistarih = DateTime(now.year, now.month + 1, 1);
-                    }
+                  if (index == 0) {
+                    // Bu ay
+
+                    Provider.of<Veriprovider>(
+                      context,
+                      listen: false,
+                    ).baslangictarih = DateTime(now.year, now.month, 1);
+
+                    Provider.of<Veriprovider>(
+                      context,
+                      listen: false,
+                    ).bitistarih = DateTime(now.year, now.month + 1, 1);
+                  } else if (index == 1) {
+                    // Geçen ay
+
+                    Provider.of<Veriprovider>(
+                      context,
+                      listen: false,
+                    ).baslangictarih = DateTime(now.year, now.month - 1, 1);
+
+                    Provider.of<Veriprovider>(
+                      context,
+                      listen: false,
+                    ).bitistarih = DateTime(now.year, now.month, 1);
+                  } else {
+                    // Son 3 ay
+
+                    Provider.of<Veriprovider>(
+                      context,
+                      listen: false,
+                    ).baslangictarih = DateTime(now.year, now.month - 2, 1);
+
+                    Provider.of<Veriprovider>(
+                      context,
+                      listen: false,
+                    ).bitistarih = DateTime(now.year, now.month + 1, 1);
+                  }
+                  await Provider.of<Veriprovider>(
+                    context,
+                    listen: false,
+                  ).gettumveries();
+                  setState(() {
                     selectedIndex = index;
                   });
                 },
@@ -435,11 +456,11 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
                           spacing: 5,
                           children: [
                             Icon(
-                              Icons.share,
+                              Icons.picture_as_pdf,
                               color: Theme.of(context).primaryColor,
                             ),
                             Text(
-                              'Verileri paylaş',
+                              'Verileri Yazdir',
                               style: Theme.of(context).textTheme.bodyMedium,
                             ),
                           ],
@@ -534,13 +555,7 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
                   } else if (value == 'paylas') {
                     await pdfolustur();
                   } else if (value == 'analiz') {
-                    context.push(
-                      Paths.analizsayfasi,
-                      extra: {
-                        'baslangictarih': baslangictarih,
-                        'bitistarih': bitistarih,
-                      },
-                    );
+                    context.push(Paths.analizsayfasi);
                   }
                 },
               ),

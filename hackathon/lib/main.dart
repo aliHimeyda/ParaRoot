@@ -5,14 +5,17 @@ import 'package:hackathon/loader.dart';
 import 'package:hackathon/profilmodel.dart';
 import 'package:hackathon/router.dart';
 import 'package:hackathon/themeprovider.dart';
+import 'package:hackathon/veriprovider.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:provider/provider.dart';
 
 final getIt = GetIt.instance;
+final getItveri = GetIt.instance;
 final getItprofil = GetIt.instance;
 
 void setupLocator() {
   getIt.registerLazySingleton<Loader>(() => Loader());
+  getItveri.registerLazySingleton<Veriprovider>(() => Veriprovider());
   getItprofil.registerLazySingleton<Profilmodel>(() => Profilmodel());
 }
 
@@ -26,8 +29,10 @@ Future<void> main() async {
     MultiProvider(
       providers: [
         ChangeNotifierProvider<Loader>.value(value: getIt<Loader>()),
+        ChangeNotifierProvider<Veriprovider>.value(value: getItveri<Veriprovider>()),
         ChangeNotifierProvider<Profilmodel>.value(value: getItprofil<Profilmodel>()),
         ChangeNotifierProvider(create: (_) => AppTheme()),
+        ChangeNotifierProvider(create: (_) => Veriprovider()),
       ],
       child: Program(),
     ),

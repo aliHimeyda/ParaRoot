@@ -21,6 +21,9 @@ Future<void> getcurrentuser() async {
   Firebaseservices.currentuser = FirebaseAuth.instance.currentUser;
   Firebaseservices.isloading = true;
 }
+Future<void> addveri(Map<String,dynamic> veri)async{
+  await FirebaseFirestore.instance.collection('gelirgidertablosu').add(veri);
+}
 
 Future<Map<String, dynamic>?> getUserData() async {
   final uid = FirebaseAuth.instance.currentUser?.uid;

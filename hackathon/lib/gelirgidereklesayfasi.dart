@@ -8,6 +8,7 @@ import 'package:hackathon/loader.dart';
 import 'package:hackathon/main.dart';
 import 'package:hackathon/profilmodel.dart';
 import 'package:hackathon/router.dart';
+import 'package:hackathon/veriprovider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -785,7 +786,8 @@ class _GelirGiderEkleSayfasiState extends State<GelirGiderEkleSayfasi> {
       'ID': uid,
       'gelirturu': _turController.text,
       'baslik': _baslikController.text,
-      'tarih': selectedDate,
+      'tarih': Timestamp.fromDate(selectedDate),
+
       'deger': int.tryParse(_degerController.text) ?? 0.0,
       'aciklama': _aciklamaController.text,
       'gidermi': isGelir ? false : true,
@@ -793,8 +795,8 @@ class _GelirGiderEkleSayfasiState extends State<GelirGiderEkleSayfasi> {
           resimURL ??
           '', //_resimController.text, hata verdigi icin simdilik devre disi
     };
-
-    await FirebaseFirestore.instance.collection('gelirgidertablosu').add(veri);
+    await addveri(veri);
+    Provider.of<Veriprovider>(context, listen: false).addveri(veri);
     getIt<Loader>().loading = false;
     getIt<Loader>().change();
     context.pop();
