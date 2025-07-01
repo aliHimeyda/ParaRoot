@@ -17,6 +17,28 @@ class Veriprovider with ChangeNotifier {
     notifyListeners();
   }
 
+  Future<void> deletealldata() async {
+    getIt<Loader>().loading = true;
+    getIt<Loader>().change();
+    veri.clear();
+    gelirtoplami = 0;
+    borctoplami = 0;
+    await tumkayitlarisil(baslangictarih, bitistarih);
+    notifyListeners();
+    getIt<Loader>().loading = false;
+    getIt<Loader>().change();
+  }
+
+  Future<void> deletedata(Map<String, dynamic>? silinecekveri) async {
+    if (silinecekveri!['gidermi']) {
+      borctoplami -= (silinecekveri['deger'] as num).toInt();
+    } else {
+      gelirtoplami -= (silinecekveri['deger'] as num).toInt();
+    }
+    veri.remove(silinecekveri);
+    notifyListeners();
+  }
+
   Future<void> getusermoneytoplami() async {
     gelirtoplami = await getUsermoneytoplami(baslangictarih, bitistarih);
     notifyListeners();

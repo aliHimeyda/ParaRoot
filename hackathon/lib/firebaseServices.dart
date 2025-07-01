@@ -108,8 +108,7 @@ Future<int> getUsermoneytoplami(
 
 Future<void> tumkayitlarisil( DateTime baslangictarih,
   DateTime bitistarih,) async {
-  getIt<Loader>().loading = true;
-  getIt<Loader>().change();
+
   final uid = FirebaseAuth.instance.currentUser!.uid;
   final querySnapshot =
       await FirebaseFirestore.instance
@@ -123,13 +122,10 @@ Future<void> tumkayitlarisil( DateTime baslangictarih,
   for (var doc in querySnapshot.docs) {
     await doc.reference.delete();
   }
-  getIt<Loader>().loading = false;
-  getIt<Loader>().change();
 }
 
 Future<void> kayitsil(HareketModel hareket) async {
-  getIt<Loader>().loading = true;
-  getIt<Loader>().change();
+  
   final uid = FirebaseAuth.instance.currentUser!.uid;
   final querySnapshot =
       await FirebaseFirestore.instance
@@ -143,8 +139,6 @@ Future<void> kayitsil(HareketModel hareket) async {
   for (var doc in querySnapshot.docs) {
     await doc.reference.delete();
   }
-  getIt<Loader>().loading = false;
-  getIt<Loader>().change();
 }
 
 Future<int> getUserborctoplami(

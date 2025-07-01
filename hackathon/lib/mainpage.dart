@@ -1,6 +1,8 @@
 // ignore_for_file: avoid_unnecessary_containers
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hackathon/firebaseServices.dart';
 import 'package:hackathon/router.dart';
@@ -31,6 +33,7 @@ class _AnasayfaState extends State<Anasayfa> {
         currentPath != Paths.hareketdetaysayfasi &&
         currentPath != Paths.gelirgidereklesayfasi &&
         currentPath != Paths.qrsayfasi &&
+        currentPath != Paths.alarmpage &&
         currentPath != Paths.kameracekimsayfasi; //
     return Scaffold(
       extendBody: true,
@@ -132,7 +135,75 @@ class _AnasayfaState extends State<Anasayfa> {
                           ),
                         ],
                       ),
-                      const SizedBox(width: 40), // Ortadaki buton boşluğu
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            icon: Image.asset(
+                              width: 27,
+                              height: 27,
+                              'assets/alarm.png',
+                              color:
+                                  !Provider.of<AppTheme>(
+                                        context,
+                                        listen: false,
+                                      ).isdarkmode
+                                      ? AppColors.yesil
+                                      : AppColors.siyah,
+                            ),
+                            onPressed: () {
+                              context.push(Paths.alarmpage);
+                            },
+                          ),
+                          Text(
+                            'Alarm',
+                            style: TextStyle(
+                              color:
+                                  !Provider.of<AppTheme>(
+                                        context,
+                                        listen: false,
+                                      ).isdarkmode
+                                      ? AppColors.yesil
+                                      : AppColors.siyah,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(width: 50), // Ortadaki buton boşluğu
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          IconButton(
+                            icon: Image.asset(
+                              width: 27,
+                              height: 27,
+                              'assets/limit.png',
+                              color:
+                                  !Provider.of<AppTheme>(
+                                        context,
+                                        listen: false,
+                                      ).isdarkmode
+                                      ? AppColors.yesil
+                                      : AppColors.siyah,
+                            ),
+                            onPressed: () {
+                              context.go(Paths.hareketler);
+                            },
+                          ),
+                          Text(
+                            'Limit',
+                            style: TextStyle(
+                              color:
+                                  !Provider.of<AppTheme>(
+                                        context,
+                                        listen: false,
+                                      ).isdarkmode
+                                      ? AppColors.yesil
+                                      : AppColors.siyah,
+                            ),
+                          ),
+                        ],
+                      ),
                       // Profil
                       Column(
                         mainAxisAlignment: MainAxisAlignment.center,

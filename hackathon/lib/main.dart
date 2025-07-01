@@ -1,6 +1,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:hackathon/alarm.dart';
 import 'package:hackathon/loader.dart';
 import 'package:hackathon/profilmodel.dart';
 import 'package:hackathon/router.dart';
@@ -33,6 +34,7 @@ Future<void> main() async {
         ChangeNotifierProvider<Profilmodel>.value(value: getItprofil<Profilmodel>()),
         ChangeNotifierProvider(create: (_) => AppTheme()),
         ChangeNotifierProvider(create: (_) => Veriprovider()),
+        ChangeNotifierProvider(create: (_) => Alarmmodel()),
       ],
       child: Program(),
     ),

@@ -199,8 +199,20 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
                       hareket: hareket,
                       aynitarihmi: aynitarihmi,
                       silmek: () async {
+                        getIt<Loader>().loading = true;
+                        getIt<Loader>().change();
                         await kayitsil(hareket);
-                        setState(() {});
+                        await Provider.of<Veriprovider>(
+                          context,
+                          listen: false,
+                        ).deletedata(
+                          Provider.of<Veriprovider>(
+                            context,
+                            listen: false,
+                          ).veri[index - 1],
+                        );
+                        getIt<Loader>().loading = false;
+                        getIt<Loader>().change();
                       },
                     );
                   }
@@ -397,42 +409,6 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
                 itemBuilder:
                     (context) => [
                       PopupMenuItem(
-                        value: 'hatirlatici',
-                        padding: EdgeInsets.only(left: 20, right: 20),
-                        child: Row(
-                          spacing: 5,
-                          children: [
-                            Icon(
-                              Icons.alarm,
-                              color: Theme.of(context).primaryColor,
-                            ),
-
-                            Text(
-                              'Hatirlatici',
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            ),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem(
-                        value: 'limit',
-                        padding: EdgeInsets.only(left: 20, right: 20),
-                        child: Row(
-                          spacing: 5,
-                          children: [
-                            Icon(
-                              Icons.block,
-                              color: Theme.of(context).primaryColor,
-                            ),
-
-                            Text(
-                              'Limit Ekle',
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            ),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem(
                         padding: EdgeInsets.only(left: 20, right: 20),
                         value: 'sil',
                         child: Row(
@@ -485,8 +461,7 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
                       ),
                     ],
                 onSelected: (value) async {
-                  if (value == 'hatirlatici') {
-                  } else if (value == 'sil') {
+                  if (value == 'sil') {
                     showDialog(
                       context: context,
                       builder:
@@ -529,10 +504,10 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
                                       ),
                                       TextButton(
                                         onPressed: () async {
-                                          await tumkayitlarisil(
-                                            baslangictarih,
-                                            bitistarih,
-                                          );
+                                          await Provider.of<Veriprovider>(
+                                            context,
+                                            listen: false,
+                                          ).deletealldata();
                                           Navigator.pop(context);
                                           setState(() {});
                                         },
@@ -551,7 +526,6 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
                             ),
                           ),
                     );
-                  } else if (value == 'limit') {
                   } else if (value == 'paylas') {
                     await pdfolustur();
                   } else if (value == 'analiz') {

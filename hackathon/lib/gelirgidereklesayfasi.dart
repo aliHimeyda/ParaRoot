@@ -787,7 +787,6 @@ class _GelirGiderEkleSayfasiState extends State<GelirGiderEkleSayfasi> {
       'gelirturu': _turController.text,
       'baslik': _baslikController.text,
       'tarih': Timestamp.fromDate(selectedDate),
-
       'deger': int.tryParse(_degerController.text) ?? 0.0,
       'aciklama': _aciklamaController.text,
       'gidermi': isGelir ? false : true,

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:hackathon/alarm.dart';
 import 'package:hackathon/analizsayfasi.dart';
 import 'package:hackathon/gelirgidereklesayfasi.dart';
 import 'package:hackathon/hareketdetaysayfasi.dart';
@@ -26,6 +27,7 @@ class Paths {
   static const String kameracekimsayfasi = '/kameracekimsayfasi';
   static const String analizsayfasi = '/analizsayfasi';
   static const String qrsayfasi = '/qrsayfasi';
+  static const String alarmpage = '/alarmpage';
 }
 
 // ignore: non_constant_identifier_names
@@ -111,6 +113,14 @@ final router = GoRouter(
             GoRoute(
               path: Paths.analizsayfasi,
               builder: (context, state) => const Analizsayfasi(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: Paths.alarmpage,
+              builder: (context, state) => const Alarmpage(),
             ),
           ],
         ),
