@@ -148,35 +148,33 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
                   } else {
                     final HareketModel hareket = HareketModel(
                       id: context.watch<Veriprovider>().veri[index - 1]!['ID'],
-                      tarih:
-                          context
-                              .watch<Veriprovider>()
-                              .veri[index - 1]!['tarih']
-                              .toDate(),
-                      gidermi:
-                          context.watch<Veriprovider>().veri[index -
-                              1]!['gidermi'],
-                      baslik:
-                          context.watch<Veriprovider>().veri[index -
-                              1]!['baslik'],
-                      gelirTarihi:
-                          context
-                              .watch<Veriprovider>()
-                              .veri[index - 1]!['tarih']
-                              .toDate()
-                              .toString(),
-                      gelirTuru:
-                          context.watch<Veriprovider>().veri[index -
-                              1]!['gelirturu'],
-                      deger:
-                          context.watch<Veriprovider>().veri[index -
-                              1]!['deger'],
-                      aciklama:
-                          context.watch<Veriprovider>().veri[index -
-                              1]!['aciklama'],
-                      imageAssetPath:
-                          context.watch<Veriprovider>().veri[index -
-                              1]!['imageUrl'],
+                      tarih: context
+                          .watch<Veriprovider>()
+                          .veri[index - 1]!['tarih']
+                          .toDate(),
+                      gidermi: context
+                          .watch<Veriprovider>()
+                          .veri[index - 1]!['gidermi'],
+                      baslik: context
+                          .watch<Veriprovider>()
+                          .veri[index - 1]!['baslik'],
+                      gelirTarihi: context
+                          .watch<Veriprovider>()
+                          .veri[index - 1]!['tarih']
+                          .toDate()
+                          .toString(),
+                      gelirTuru: context
+                          .watch<Veriprovider>()
+                          .veri[index - 1]!['gelirturu'],
+                      deger: context
+                          .watch<Veriprovider>()
+                          .veri[index - 1]!['deger'],
+                      aciklama: context
+                          .watch<Veriprovider>()
+                          .veri[index - 1]!['aciklama'],
+                      imageAssetPath: context
+                          .watch<Veriprovider>()
+                          .veri[index - 1]!['imageUrl'],
                     );
                     late bool aynitarihmi = false;
                     if ((index - 2) >= 0) {
@@ -234,10 +232,10 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
         children: [
           const SizedBox(height: 20),
           SizedBox(
-            width: 150,
-            height: 150,
+            width: 100,
+            height: 100,
             child: Image.asset(
-              'assets/Swap.png',
+              'assets/loading.png',
               color: Theme.of(context).primaryColor,
             ),
           ),
@@ -301,36 +299,60 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
                     Provider.of<Veriprovider>(
                       context,
                       listen: false,
-                    ).baslangictarih = DateTime(now.year, now.month, 1);
+                    ).baslangictarih = DateTime(
+                      now.year,
+                      now.month,
+                      1,
+                    );
 
                     Provider.of<Veriprovider>(
                       context,
                       listen: false,
-                    ).bitistarih = DateTime(now.year, now.month + 1, 1);
+                    ).bitistarih = DateTime(
+                      now.year,
+                      now.month + 1,
+                      1,
+                    );
                   } else if (index == 1) {
                     // Geçen ay
 
                     Provider.of<Veriprovider>(
                       context,
                       listen: false,
-                    ).baslangictarih = DateTime(now.year, now.month - 1, 1);
+                    ).baslangictarih = DateTime(
+                      now.year,
+                      now.month - 1,
+                      1,
+                    );
 
                     Provider.of<Veriprovider>(
                       context,
                       listen: false,
-                    ).bitistarih = DateTime(now.year, now.month, 1);
+                    ).bitistarih = DateTime(
+                      now.year,
+                      now.month,
+                      1,
+                    );
                   } else {
                     // Son 3 ay
 
                     Provider.of<Veriprovider>(
                       context,
                       listen: false,
-                    ).baslangictarih = DateTime(now.year, now.month - 2, 1);
+                    ).baslangictarih = DateTime(
+                      now.year,
+                      now.month - 2,
+                      1,
+                    );
 
                     Provider.of<Veriprovider>(
                       context,
                       listen: false,
-                    ).bitistarih = DateTime(now.year, now.month + 1, 1);
+                    ).bitistarih = DateTime(
+                      now.year,
+                      now.month + 1,
+                      1,
+                    );
                   }
                   await Provider.of<Veriprovider>(
                     context,
@@ -342,30 +364,30 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
                 },
                 child: Container(
                   decoration: BoxDecoration(
-                    color:
-                        isSelected
-                            ? Theme.of(context).primaryColor
-                            : Theme.of(context).scaffoldBackgroundColor,
+                    color: isSelected
+                        ? Theme.of(context).primaryColor
+                        : Theme.of(context).scaffoldBackgroundColor,
                     borderRadius: BorderRadius.only(
-                      topLeft:
-                          index == 0 ? const Radius.circular(12) : Radius.zero,
-                      bottomLeft:
-                          index == 0 ? const Radius.circular(12) : Radius.zero,
+                      topLeft: index == 0
+                          ? const Radius.circular(12)
+                          : Radius.zero,
+                      bottomLeft: index == 0
+                          ? const Radius.circular(12)
+                          : Radius.zero,
                     ),
                   ),
                   alignment: Alignment.center,
                   child: Text(
                     labels[index],
                     style: TextStyle(
-                      color:
-                          isSelected
-                              ? !Provider.of<AppTheme>(
-                                    context,
-                                    listen: false,
-                                  ).isdarkmode
-                                  ? Colors.white
-                                  : Colors.black
-                              : Theme.of(context).textTheme.bodyLarge!.color,
+                      color: isSelected
+                          ? !Provider.of<AppTheme>(
+                                  context,
+                                  listen: false,
+                                ).isdarkmode
+                                ? Colors.white
+                                : Colors.black
+                          : Theme.of(context).textTheme.bodyLarge!.color,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
@@ -395,10 +417,9 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
             child: Theme(
               data: Theme.of(context).copyWith(
                 popupMenuTheme: PopupMenuThemeData(
-                  color:
-                      Theme.of(
-                        context,
-                      ).scaffoldBackgroundColor, // Menü arka planı
+                  color: Theme.of(
+                    context,
+                  ).scaffoldBackgroundColor, // Menü arka planı
                 ),
               ),
               child: PopupMenuButton<String>(
@@ -406,125 +427,119 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
                   Icons.more_vert,
                   color: Theme.of(context).primaryColor,
                 ),
-                itemBuilder:
-                    (context) => [
-                      PopupMenuItem(
-                        padding: EdgeInsets.only(left: 20, right: 20),
-                        value: 'sil',
-                        child: Row(
-                          spacing: 5,
-                          children: [
-                            Icon(
-                              Icons.delete_forever,
-                              color: Theme.of(context).primaryColor,
-                            ),
-                            Text(
-                              'Tüm kayıtları sil',
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            ),
-                          ],
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    padding: EdgeInsets.only(left: 20, right: 20),
+                    value: 'sil',
+                    child: Row(
+                      spacing: 5,
+                      children: [
+                        Icon(
+                          Icons.delete_forever,
+                          color: Theme.of(context).primaryColor,
                         ),
-                      ),
-                      PopupMenuItem(
-                        padding: EdgeInsets.only(left: 20, right: 20),
-                        value: 'paylas',
-                        child: Row(
-                          spacing: 5,
-                          children: [
-                            Icon(
-                              Icons.picture_as_pdf,
-                              color: Theme.of(context).primaryColor,
-                            ),
-                            Text(
-                              'Verileri Yazdir',
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            ),
-                          ],
+                        Text(
+                          'Tüm kayıtları sil',
+                          style: Theme.of(context).textTheme.bodyMedium,
                         ),
-                      ),
-                      PopupMenuItem(
-                        padding: EdgeInsets.only(left: 20, right: 20),
-                        value: 'analiz',
-                        child: Row(
-                          spacing: 5,
-                          children: [
-                            Icon(
-                              Icons.analytics,
-                              color: Theme.of(context).primaryColor,
-                            ),
-                            Text(
-                              'Analiz olustur',
-                              style: Theme.of(context).textTheme.bodyMedium,
-                            ),
-                          ],
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    padding: EdgeInsets.only(left: 20, right: 20),
+                    value: 'paylas',
+                    child: Row(
+                      spacing: 5,
+                      children: [
+                        Icon(
+                          Icons.picture_as_pdf,
+                          color: Theme.of(context).primaryColor,
                         ),
-                      ),
-                    ],
+                        Text(
+                          'Verileri Yazdir',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem(
+                    padding: EdgeInsets.only(left: 20, right: 20),
+                    value: 'analiz',
+                    child: Row(
+                      spacing: 5,
+                      children: [
+                        Icon(
+                          Icons.analytics,
+                          color: Theme.of(context).primaryColor,
+                        ),
+                        Text(
+                          'Analiz olustur',
+                          style: Theme.of(context).textTheme.bodyMedium,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
                 onSelected: (value) async {
                   if (value == 'sil') {
                     showDialog(
                       context: context,
-                      builder:
-                          (context) => Dialog(
-                            backgroundColor:
-                                Theme.of(context).scaffoldBackgroundColor,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(20),
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
+                      builder: (context) => Dialog(
+                        backgroundColor: Theme.of(
+                          context,
+                        ).scaffoldBackgroundColor,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(20),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Center(
+                                child: Text(
+                                  '${DateFormat('dd/mm/yyyy').format(baslangictarih)}-${DateFormat('dd/mm/yyyy').format(bitistarih)} arasi kayitlar silinecektir ,\nonayliyor musunuz?',
+                                  style: Theme.of(context).textTheme.bodyMedium,
+                                ),
+                              ),
+                              Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
                                 children: [
-                                  Center(
+                                  TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
                                     child: Text(
-                                      '${DateFormat('dd/mm/yyyy').format(baslangictarih)}-${DateFormat('dd/mm/yyyy').format(bitistarih)} arasi kayitlar silinecektir ,\nonayliyor musunuz?',
-                                      style:
-                                          Theme.of(
-                                            context,
-                                          ).textTheme.bodyMedium,
+                                      'Iptal',
+
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodyMedium,
                                     ),
                                   ),
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.pop(context);
-                                        },
-                                        child: Text(
-                                          'Iptal',
-
-                                          style:
-                                              Theme.of(
-                                                context,
-                                              ).textTheme.bodyMedium,
-                                        ),
-                                      ),
-                                      TextButton(
-                                        onPressed: () async {
-                                          await Provider.of<Veriprovider>(
-                                            context,
-                                            listen: false,
-                                          ).deletealldata();
-                                          Navigator.pop(context);
-                                          setState(() {});
-                                        },
-                                        child: Text(
-                                          'Devam',
-                                          style:
-                                              Theme.of(
-                                                context,
-                                              ).textTheme.bodyMedium,
-                                        ),
-                                      ),
-                                    ],
+                                  TextButton(
+                                    onPressed: () async {
+                                      await Provider.of<Veriprovider>(
+                                        context,
+                                        listen: false,
+                                      ).deletealldata();
+                                      Navigator.pop(context);
+                                      setState(() {});
+                                    },
+                                    child: Text(
+                                      'Devam',
+                                      style: Theme.of(
+                                        context,
+                                      ).textTheme.bodyMedium,
+                                    ),
                                   ),
                                 ],
                               ),
-                            ),
+                            ],
                           ),
+                        ),
+                      ),
                     );
                   } else if (value == 'paylas') {
                     await pdfolustur();

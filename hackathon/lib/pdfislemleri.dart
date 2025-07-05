@@ -1,23 +1,16 @@
-import 'dart:io';
 import 'dart:typed_data';
-
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/material.dart';
 import 'package:hackathon/loader.dart';
 import 'package:hackathon/main.dart';
 import 'package:intl/intl.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
-import 'package:printing/printing.dart';
 
 class Pdfislemleri {
   static Future<Uint8List> generateFaturaPdf(
     List<Map<String, dynamic>?> veriListesi, {
     String faturaNo = "123-456-7890",
   }) async {
-    getIt<Loader>().loading = true;
-    getIt<Loader>().change();
     String ayYil = DateFormat('dd/mm/yyyy').format(DateTime.now()).toString();
     final pdf = pw.Document();
     final baseColor = PdfColor.fromHex('#005C78');
@@ -126,8 +119,9 @@ class Pdfislemleri {
                   ...sublist.asMap().entries.map((entry) {
                     final index = i + entry.key + 1;
                     final item = entry.value;
-                    final tur =
-                        item!['gidermi']?.toString() == "false" ? '+' : '-';
+                    final tur = item!['gidermi']?.toString() == "false"
+                        ? '+'
+                        : '-';
                     final int price = item['deger'];
 
                     if (tur == '+') toplamGelir += price;
@@ -197,8 +191,6 @@ class Pdfislemleri {
         ),
       );
     }
-    getIt<Loader>().loading = false;
-    getIt<Loader>().change();
     return pdf.save();
   }
 }

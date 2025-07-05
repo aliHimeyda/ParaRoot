@@ -2,16 +2,13 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hackathon/colors.dart';
 import 'package:hackathon/firebaseServices.dart';
 import 'package:hackathon/loader.dart';
 import 'package:hackathon/main.dart';
 import 'package:hackathon/profilmodel.dart';
 import 'package:hackathon/router.dart';
 import 'package:hackathon/veriprovider.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 class GelirGiderEkleSayfasi extends StatefulWidget {

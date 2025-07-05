@@ -1,29 +1,55 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+class Savethemeinformation {
+  late String modeinformation = 'light';
+}
 
 class AppTheme extends ChangeNotifier {
   ThemeMode themeMode = ThemeMode.light;
+  ThemeData themeData = AppTheme.lightMode;
   late bool isdarkmode = false;
   late IconData temaiconu = Icons.light_mode;
-  ThemeData get theme {
-    if (themeMode == ThemeMode.light) {
-      isdarkmode = false;
-      return lightMode;
-    } else {
-      isdarkmode = true;
-      return darkMode;
+  ThemeData get theme => themeData;
+  AppTheme() {
+    _loadTheme();
+  }
+  void _loadTheme() async {
+    final prefs = await SharedPreferences.getInstance();
+    final savedTheme = prefs.getString('thmemode') ?? 'system';
+
+    switch (savedTheme) {
+      case 'light':
+        themeData = AppTheme.lightMode;
+        isdarkmode = false;
+        break;
+      case 'dark':
+        themeData = AppTheme.darkMode;
+        isdarkmode = true;
+
+        break;
+      default:
+        themeData = AppTheme.lightMode;
+        isdarkmode = false;
     }
+
+    notifyListeners();
   }
 
-  void changetheme() {
-    if (themeMode == ThemeMode.light) {
-      themeMode = ThemeMode.dark;
+  void changetheme() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    if (themeData == AppTheme.lightMode) {
+      themeData = AppTheme.darkMode;
       isdarkmode = true;
       temaiconu = Icons.dark_mode;
+      await prefs.setString('thmemode', 'dark');
       notifyListeners();
     } else {
-      themeMode = ThemeMode.light;
+      themeData = AppTheme.lightMode;
       isdarkmode = false;
       temaiconu = Icons.light_mode;
+      await prefs.setString('thmemode', 'light');
       notifyListeners();
     }
   }
@@ -39,9 +65,8 @@ class AppTheme extends ChangeNotifier {
     ), // Sayfanın arka plan rengini belirler
 
     appBarTheme: AppBarTheme(
-      backgroundColor:
-          AppColors
-              .yesil, // Uygulama çubuğunun (AppBar) arka plan rengini belirler
+      backgroundColor: AppColors
+          .yesil, // Uygulama çubuğunun (AppBar) arka plan rengini belirler
       titleTextStyle: const TextStyle(
         color: AppColors.mavi, // AppBar başlık rengini beyaz yapar
         fontSize: 20, // Başlık yazı boyutunu ayarlar
@@ -53,9 +78,8 @@ class AppTheme extends ChangeNotifier {
     ),
 
     iconTheme: IconThemeData(
-      color:
-          AppColors
-              .sari, // Genel ikon rengini koyu gri yapar (örn: klasör ikonları)
+      color: AppColors
+          .sari, // Genel ikon rengini koyu gri yapar (örn: klasör ikonları)
     ),
 
     floatingActionButtonTheme: FloatingActionButtonThemeData(
@@ -71,9 +95,8 @@ class AppTheme extends ChangeNotifier {
 
       labelTextStyle: WidgetStateProperty.all(
         TextStyle(
-          color:
-              AppColors
-                  .koyuGri, // Alt navigasyon etiketi (label) rengini koyu gri yapar
+          color: AppColors
+              .koyuGri, // Alt navigasyon etiketi (label) rengini koyu gri yapar
           fontSize: 12, // Etiket yazı boyutunu belirler
           fontWeight: FontWeight.bold, // Etiket yazısını kalın yapar
         ),
@@ -105,9 +128,8 @@ class AppTheme extends ChangeNotifier {
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         textStyle: TextStyle(color: AppColors.yesil, fontSize: 13),
-        backgroundColor:
-            AppColors
-                .mavi, // Yükseltilmiş butonların (ElevatedButton) arka plan rengini belirler
+        backgroundColor: AppColors
+            .mavi, // Yükseltilmiş butonların (ElevatedButton) arka plan rengini belirler
         foregroundColor:
             Colors.white, // Buton içindeki yazının rengini beyaz yapar
         shape: RoundedRectangleBorder(

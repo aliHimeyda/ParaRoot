@@ -2,16 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hackathon/colors.dart';
 import 'package:hackathon/firebaseServices.dart';
-import 'package:hackathon/kameracekimsayfasi.dart';
 import 'package:hackathon/loader.dart';
 import 'package:hackathon/main.dart';
 import 'package:hackathon/profilmodel.dart';
 import 'package:hackathon/router.dart';
 import 'package:hackathon/themeprovider.dart';
-import 'package:image_picker/image_picker.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 
 class ProfilSayfasi extends StatefulWidget {
@@ -98,19 +94,19 @@ class _ProfilSayfasiState extends State<ProfilSayfasi> {
                             ), // açık gri arka plan
                             child:
                                 context
-                                            .watch<Profilmodel>()
-                                            .currentuser['profilresmi'] ==
-                                        ''
-                                    ? Image.asset(
-                                      'assets/anonimresmi.png',
-                                      fit: BoxFit.contain,
-                                    )
-                                    : Image.network(
-                                      context
-                                          .watch<Profilmodel>()
-                                          .currentuser['profilresmi'],
-                                      fit: BoxFit.cover,
-                                    ),
+                                        .watch<Profilmodel>()
+                                        .currentuser['profilresmi'] ==
+                                    ''
+                                ? Image.asset(
+                                    'assets/anonimresmi.png',
+                                    fit: BoxFit.contain,
+                                  )
+                                : Image.network(
+                                    context
+                                        .watch<Profilmodel>()
+                                        .currentuser['profilresmi'],
+                                    fit: BoxFit.cover,
+                                  ),
                           ),
 
                           // Küçük kamera dairesi
@@ -125,8 +121,9 @@ class _ProfilSayfasiState extends State<ProfilSayfasi> {
                                 width: 36,
                                 height: 36,
                                 decoration: BoxDecoration(
-                                  color:
-                                      Theme.of(context).scaffoldBackgroundColor,
+                                  color: Theme.of(
+                                    context,
+                                  ).scaffoldBackgroundColor,
                                   shape: BoxShape.circle,
                                   boxShadow: [
                                     BoxShadow(
@@ -166,10 +163,9 @@ class _ProfilSayfasiState extends State<ProfilSayfasi> {
                   TextField(
                     decoration: InputDecoration(
                       labelText: "Adınız ve Soyadınız",
-                      hintText:
-                          context
-                              .watch<Profilmodel>()
-                              .currentuser['isimsoyisim'],
+                      hintText: context
+                          .watch<Profilmodel>()
+                          .currentuser['isimsoyisim'],
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                       ),
@@ -237,14 +233,12 @@ class _ProfilSayfasiState extends State<ProfilSayfasi> {
                             },
                             // value: widget.isDarkMode,
                             // onChanged: widget.onChanged, // Tema değiştirme fonksiyonunu çağırır
-                            activeColor:
-                                Theme.of(
-                                  context,
-                                ).primaryColor, // Açık mod rengi
-                            inactiveThumbColor:
-                                Theme.of(
-                                  context,
-                                ).primaryColor, // Karanlık mod rengi
+                            activeColor: Theme.of(
+                              context,
+                            ).primaryColor, // Açık mod rengi
+                            inactiveThumbColor: Theme.of(
+                              context,
+                            ).primaryColor, // Karanlık mod rengi
                           ),
                         ],
                       ),
@@ -311,31 +305,26 @@ class _ProfilSayfasiState extends State<ProfilSayfasi> {
           .collection('kullanicibilgileri')
           .doc(uid)
           .update({
-            'isimsoyisim':
-                Provider.of<Profilmodel>(
-                  context,
-                  listen: false,
-                ).currentuser['isimsoyisim'],
-            'mail':
-                Provider.of<Profilmodel>(
-                  context,
-                  listen: false,
-                ).currentuser['mail'],
-            'profilresmi':
-                Provider.of<Profilmodel>(
-                  context,
-                  listen: false,
-                ).currentuser['profilresmi'],
-            'sifre':
-                Provider.of<Profilmodel>(
-                  context,
-                  listen: false,
-                ).currentuser['sifre'],
-            'telefon':
-                Provider.of<Profilmodel>(
-                  context,
-                  listen: false,
-                ).currentuser['telefon'],
+            'isimsoyisim': Provider.of<Profilmodel>(
+              context,
+              listen: false,
+            ).currentuser['isimsoyisim'],
+            'mail': Provider.of<Profilmodel>(
+              context,
+              listen: false,
+            ).currentuser['mail'],
+            'profilresmi': Provider.of<Profilmodel>(
+              context,
+              listen: false,
+            ).currentuser['profilresmi'],
+            'sifre': Provider.of<Profilmodel>(
+              context,
+              listen: false,
+            ).currentuser['sifre'],
+            'telefon': Provider.of<Profilmodel>(
+              context,
+              listen: false,
+            ).currentuser['telefon'],
           });
       getIt<Loader>().loading = false;
       getIt<Loader>().change();
@@ -451,17 +440,17 @@ class _ProfilSayfasiState extends State<ProfilSayfasi> {
                   style: Theme.of(context).elevatedButtonTheme.style,
                   onPressed: () {
                     Provider.of<Profilmodel>(
-                          context,
-                          listen: false,
-                        ).currentuser['telefon'] =
-                        _telefonController.text;
+                      context,
+                      listen: false,
+                    ).currentuser['telefon'] = _telefonController.text;
 
                     Provider.of<Profilmodel>(context, listen: false).guncelle();
                     context.pop();
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        backgroundColor:
-                            Theme.of(context).scaffoldBackgroundColor,
+                        backgroundColor: Theme.of(
+                          context,
+                        ).scaffoldBackgroundColor,
                         content: Text(
                           "basarili",
                           style: Theme.of(context).textTheme.labelLarge,
@@ -534,17 +523,17 @@ class _ProfilSayfasiState extends State<ProfilSayfasi> {
                   style: Theme.of(context).elevatedButtonTheme.style,
                   onPressed: () {
                     Provider.of<Profilmodel>(
-                          context,
-                          listen: false,
-                        ).currentuser['mail'] =
-                        email.text;
+                      context,
+                      listen: false,
+                    ).currentuser['mail'] = email.text;
 
                     Provider.of<Profilmodel>(context, listen: false).guncelle();
                     context.pop();
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        backgroundColor:
-                            Theme.of(context).scaffoldBackgroundColor,
+                        backgroundColor: Theme.of(
+                          context,
+                        ).scaffoldBackgroundColor,
                         content: Text(
                           "basarili",
                           style: Theme.of(context).textTheme.labelLarge,
@@ -615,10 +604,9 @@ class _ProfilSayfasiState extends State<ProfilSayfasi> {
                               ? Icons.visibility
                               : Icons.visibility_off,
                         ),
-                        onPressed:
-                            () => setModalState(
-                              () => isCurrentVisible = !isCurrentVisible,
-                            ),
+                        onPressed: () => setModalState(
+                          () => isCurrentVisible = !isCurrentVisible,
+                        ),
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -637,10 +625,8 @@ class _ProfilSayfasiState extends State<ProfilSayfasi> {
                               ? Icons.visibility
                               : Icons.visibility_off,
                         ),
-                        onPressed:
-                            () => setModalState(
-                              () => isNewVisible = !isNewVisible,
-                            ),
+                        onPressed: () =>
+                            setModalState(() => isNewVisible = !isNewVisible),
                       ),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -660,10 +646,9 @@ class _ProfilSayfasiState extends State<ProfilSayfasi> {
                               listen: false,
                             ).currentuser['sifre']) {
                           Provider.of<Profilmodel>(
-                                context,
-                                listen: false,
-                              ).currentuser['sifre'] =
-                              newController.text;
+                            context,
+                            listen: false,
+                          ).currentuser['sifre'] = newController.text;
 
                           Provider.of<Profilmodel>(
                             context,
@@ -672,8 +657,9 @@ class _ProfilSayfasiState extends State<ProfilSayfasi> {
                           context.pop();
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              backgroundColor:
-                                  Theme.of(context).scaffoldBackgroundColor,
+                              backgroundColor: Theme.of(
+                                context,
+                              ).scaffoldBackgroundColor,
                               content: Text(
                                 "basarili",
                                 style: Theme.of(context).textTheme.labelLarge,
@@ -683,8 +669,9 @@ class _ProfilSayfasiState extends State<ProfilSayfasi> {
                         } else {
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              backgroundColor:
-                                  Theme.of(context).scaffoldBackgroundColor,
+                              backgroundColor: Theme.of(
+                                context,
+                              ).scaffoldBackgroundColor,
                               content: Text(
                                 "mevcut sifreniz hatali,tekrar deneyiniz",
                                 style: Theme.of(context).textTheme.labelLarge,

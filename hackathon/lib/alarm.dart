@@ -1,14 +1,39 @@
+import 'dart:async';
+import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
+import 'package:hackathon/loader.dart';
+import 'package:hackathon/main.dart';
+import 'package:permission_handler/permission_handler.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:timezone/timezone.dart' as tz;
+
+// alarm metodu : arka planda calismasi icin global olmasi lazim !!
+Future<void> requestNotificationPermission() async {
+  final status = await Permission.notification.status;
+  debugPrint("${status.isGranted}");
+  if (!status.isGranted) {
+    await Permission.notification.request();
+  }
+}
 
 class Alarmmodel with ChangeNotifier {
+  late List<Map<String, dynamic>> alarmmap = [];
   late List<Alarm> alarms = [];
+  void savechanges() {
+    notifyListeners();
+  }
 }
 
 class Alarm {
-  final DateTime zaman;
-  final String aciklama;
-  late bool isActive = false;
+  late DateTime zaman;
+  late String aciklama;
+  late bool isActive = true;
+  late String tekrar = 'gunluk';
+  late bool isgider = true;
+  late int alarmID = 0;
   Alarm({required this.zaman, required this.aciklama});
 }
 
@@ -21,6 +46,13 @@ class Bildirim extends StatelessWidget {
   }
 }
 
+class Isgelir with ChangeNotifier {
+  late bool isGelir = false;
+  void savechanges() {
+    notifyListeners();
+  }
+}
+
 class Alarmpage extends StatefulWidget {
   const Alarmpage({super.key});
 
@@ -29,64 +61,216 @@ class Alarmpage extends StatefulWidget {
 }
 
 class _AlarmpageState extends State<Alarmpage> {
-  bool isGelir = true;
+  late Future<void> getalarms;
   final TextEditingController _turController = TextEditingController();
+  // Alarm a1 = Alarm(zaman: DateTime.now(), aciklama: 'su faturasi odeme');
+  // Alarm a2 = Alarm(zaman: DateTime.now(), aciklama: 'elektrik faturasi odeme');
+  // Alarm a3 = Alarm(zaman: DateTime.now(), aciklama: 'dogalgaz faturasi odeme');
   @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      appBar: AppBar(
-        title: Text('Alarmlar', style: Theme.of(context).textTheme.bodyLarge),
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-        elevation: 0,
-      ),
-      body: ListView(
-        children: [
-          buildAlarmTile(
-            '07:00',
-            'Günlük | Alarm 8 saat 43 dakika içerisinde',
-            true,
-            context,
-          ),
-          buildAlarmTile('08:40', 'Bir kez', false, context),
-          buildAlarmTile('09:00', 'Bir kez', false, context),
-        ],
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          showAlarmDialog(context);
-        },
-        backgroundColor: Theme.of(context).primaryColor,
-        child: Icon(Icons.add, color: Colors.white),
-      ),
-    );
+  void initState() {
+    super.initState();
+
+    getalarms = getAlarms();
+    // Provider.of<Alarmmodel>(context, listen: false).alarms.add(a1);
+    // Provider.of<Alarmmodel>(context, listen: false).alarms.add(a2);
+    // Provider.of<Alarmmodel>(context, listen: false).alarms.add(a3);
   }
 
-  Widget buildAlarmTile(
-    String time,
-    String subtitle,
-    bool isActive,
-    BuildContext context,
-  ) {
-    return ListTile(
-      contentPadding: EdgeInsets.symmetric(horizontal: 16),
-      title: Text(
-        time,
-        style: TextStyle(
-          fontSize: 28,
-          fontWeight: FontWeight.bold,
-          color: Theme.of(context).primaryColor,
+  @override
+  void dispose() {
+    unawaited(saveAlarms());
+    getIt<Alarmmodel>().alarms.clear();
+    getIt<Alarmmodel>().alarmmap.clear();
+    print('Sayfa kapandı! ${getIt<Alarmmodel>().alarms.length}');
+    super.dispose(); // Bunu en son çağır
+  }
+
+  Future<void> saveAlarms() async {
+    try {
+      debugPrint('saveAlarms çalıştı ');
+
+      // Alarm listelerini map'e çevir
+      final model = getItalarms<Alarmmodel>();
+
+      debugPrint('maplistuzunlugugu : ${model.alarmmap.length}');
+      final jsonString = jsonEncode(model.alarmmap);
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setString('alarms', jsonString);
+
+      debugPrint('Alarm listesi başarıyla kaydedildi ');
+    } catch (e, s) {
+      debugPrint('HATA: saveAlarms başarısız oldu  $e');
+      debugPrintStack(stackTrace: s);
+    }
+  }
+
+  Future<void> getAlarms() async {
+    await requestNotificationPermission();
+
+    final prefs = await SharedPreferences.getInstance();
+
+    String? jsonString = prefs.getString('alarms');
+    if (jsonString == null) return;
+    debugPrint('verileralindiiiii  : $jsonString');
+
+    // JSON string → Liste'ye çevir
+    List<dynamic> decoded = jsonDecode(jsonString);
+    List<Map<String, dynamic>> alarms = decoded.cast<Map<String, dynamic>>();
+    debugPrint('verileralindiiiii :   ${alarms.length}|||${decoded.length}');
+    alarms.forEach((element) {
+      Alarm a = Alarm(
+        zaman: DateTime.fromMillisecondsSinceEpoch(element['zaman']),
+        aciklama: element['aciklama'],
+      );
+      a.isActive = element['isactive'];
+      a.isgider = element['isgider'];
+      a.tekrar = element['tekrar'];
+      getIt<Alarmmodel>().alarms.add(a);
+      getIt<Alarmmodel>().alarmmap.add(element);
+      debugPrint('verileralindiiiii :   $a');
+    });
+    getIt<Alarmmodel>().savechanges();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Stack(
+      children: [
+        Scaffold(
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+          appBar: AppBar(
+            iconTheme: IconThemeData(
+              color: Theme.of(context).primaryColor, // ← geri ok rengi
+            ),
+            title: Text(
+              'Alarmlar',
+              style: Theme.of(context).textTheme.bodyLarge,
+            ),
+            backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+            elevation: 0,
+          ),
+          body: FutureBuilder(
+            future: getalarms,
+            builder: (context, snapshot) {
+              final alarmModel = context.watch<Alarmmodel>();
+              final alarms = alarmModel.alarms;
+              final alarmmap = alarmModel.alarmmap;
+
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Provider.of<Loader>(
+                  context,
+                  listen: false,
+                ).loader(context);
+              }
+
+              if (alarms.isEmpty) {
+                return icerikbossa(context);
+              }
+
+              return ListView.builder(
+                itemCount: alarms.length,
+                itemBuilder: (context, index) {
+                  final alarm = alarms[index];
+                  final alarmm = alarmmap[index];
+
+                  return Dismissible(
+                    key: Key('benzersiz-key-$index'),
+                    direction: DismissDirection.startToEnd,
+                    onDismissed: (direction) async {
+                      final model = Provider.of<Alarmmodel>(
+                        context,
+                        listen: false,
+                      );
+                      model.alarms.removeAt(index);
+                      model.alarmmap.removeAt(index);
+                      await flutterLocalNotificationsPlugin.cancel(
+                        model.alarms[index].alarmID,
+                      );
+
+                      model.savechanges();
+                    },
+                    background: Container(
+                      color: Color.fromARGB(255, 181, 50, 41),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Padding(
+                          padding: const EdgeInsets.all(10),
+                          child: Icon(Icons.delete, color: Colors.white),
+                        ),
+                      ),
+                    ),
+                    child: ListTile(
+                      contentPadding: EdgeInsets.symmetric(horizontal: 16),
+                      title: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            '${alarm.zaman.hour.toString().padLeft(2, '0')}:${alarm.zaman.minute.toString().padLeft(2, '0')}',
+                            style: TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          ),
+                          Text(
+                            alarm.isgider ? 'Gider' : 'Gelir',
+                            style: TextStyle(
+                              color: alarm.isgider ? Colors.red : Colors.green,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      subtitle: Text(
+                        '${alarm.aciklama} | ${alarm.tekrar}',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                      trailing: Switch(
+                        value: alarm.isActive,
+                        onChanged: (value) async {
+                          final model = Provider.of<Alarmmodel>(
+                            context,
+                            listen: false,
+                          );
+                          alarms[index].isActive = !alarm.isActive;
+                          alarmmap[index]['isactive'] = !alarmm['isactive'];
+                          if (!alarms[index].isActive) {
+                            await flutterLocalNotificationsPlugin.cancel(
+                              alarms[index].alarmID,
+                            );
+                            debugPrint('cencel edildi');
+                          } else {
+                            await yenidenAktifEt(alarms[index].alarmID);
+                            debugPrint('yenidden aktif edildi');
+                          }
+                          model.savechanges();
+                        },
+                        activeColor: Theme.of(context).primaryColor,
+                        inactiveThumbColor: Theme.of(context).primaryColor,
+                        focusColor: Theme.of(context).primaryColor,
+                        inactiveTrackColor: Theme.of(
+                          context,
+                        ).scaffoldBackgroundColor,
+                      ),
+                    ),
+                  );
+                },
+              );
+            },
+          ),
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              showAlarmDialog(context);
+            },
+            backgroundColor: Theme.of(context).primaryColor,
+            child: Icon(Icons.add, color: Colors.white),
+          ),
         ),
-      ),
-      subtitle: Text(subtitle, style: Theme.of(context).textTheme.bodyMedium),
-      trailing: Switch(
-        value: isActive,
-        onChanged: (bool value) {},
-        activeColor: Theme.of(context).primaryColor,
-        inactiveThumbColor: Theme.of(context).primaryColor,
-        focusColor: Theme.of(context).primaryColor,
-        inactiveTrackColor: Theme.of(context).scaffoldBackgroundColor,
-      ),
+        context.watch<Loader>().loading
+            ? Provider.of<Loader>(context, listen: false).loader(context)
+            : SizedBox(),
+      ],
     );
   }
 
@@ -95,19 +279,25 @@ class _AlarmpageState extends State<Alarmpage> {
     TextEditingController labelController = TextEditingController();
     String repeatOption = 'Günlük';
 
+    final isgelirProvider = Provider.of<Isgelir>(context, listen: false);
+    final alarmModel = Provider.of<Alarmmodel>(context, listen: false);
+    final loader = Provider.of<Loader>(context, listen: false);
+    final isGelir = Provider.of<Isgelir>(context, listen: false).isGelir;
+
     showModalBottomSheet(
       context: context,
-      backgroundColor: Colors.grey[900],
-      shape: RoundedRectangleBorder(
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       isScrollControlled: true,
       builder: (context) {
         return Padding(
-          padding: EdgeInsets.fromLTRB(16, 24, 16, 32),
+          padding: const EdgeInsets.fromLTRB(16, 24, 16, 32),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
+              // Gelir/Gider Toggle
               Container(
                 height: 44,
                 decoration: BoxDecoration(
@@ -119,11 +309,10 @@ class _AlarmpageState extends State<Alarmpage> {
                   children: [
                     Expanded(
                       child: GestureDetector(
-                        onTap:
-                            () => setState(() {
-                              isGelir = true;
-                              _turController.text = '';
-                            }),
+                        onTap: () {
+                          isgelirProvider.isGelir = true;
+                          isgelirProvider.savechanges();
+                        },
                         child: Container(
                           decoration: BoxDecoration(
                             color: isGelir ? Colors.green : Colors.transparent,
@@ -133,12 +322,11 @@ class _AlarmpageState extends State<Alarmpage> {
                           child: Text(
                             'Gelir',
                             style: TextStyle(
-                              color:
-                                  isGelir
-                                      ? Colors.white
-                                      : Theme.of(
-                                        context,
-                                      ).textTheme.bodyMedium!.color,
+                              color: isGelir
+                                  ? Colors.white
+                                  : Theme.of(
+                                      context,
+                                    ).textTheme.bodyMedium!.color,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -147,11 +335,10 @@ class _AlarmpageState extends State<Alarmpage> {
                     ),
                     Expanded(
                       child: GestureDetector(
-                        onTap:
-                            () => setState(() {
-                              isGelir = false;
-                              _turController.text = '';
-                            }),
+                        onTap: () {
+                          isgelirProvider.isGelir = false;
+                          isgelirProvider.savechanges();
+                        },
                         child: Container(
                           decoration: BoxDecoration(
                             color: !isGelir ? Colors.red : Colors.transparent,
@@ -161,12 +348,11 @@ class _AlarmpageState extends State<Alarmpage> {
                           child: Text(
                             'Gider',
                             style: TextStyle(
-                              color:
-                                  !isGelir
-                                      ? Colors.white
-                                      : Theme.of(
-                                        context,
-                                      ).textTheme.bodyMedium!.color,
+                              color: !isGelir
+                                  ? Colors.white
+                                  : Theme.of(
+                                      context,
+                                    ).textTheme.bodyMedium!.color,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
@@ -176,95 +362,142 @@ class _AlarmpageState extends State<Alarmpage> {
                   ],
                 ),
               ),
-              Divider(height: 10),
-              Text(
-                "Saat Seç",
-                style: TextStyle(color: Colors.white, fontSize: 16),
-              ),
-              SizedBox(height: 10),
 
-              // Saat Seçici (Scroll ile)
+              const Divider(height: 10),
+
+              // Saat Seçici
               TimePickerSpinner(
-                is24HourMode: false, // AM/PM destekli
-                normalTextStyle: TextStyle(fontSize: 18, color: Colors.white54),
-                highlightedTextStyle: TextStyle(
-                  fontSize: 22,
-                  color: Colors.white,
-                ),
+                is24HourMode: true,
+                normalTextStyle: Theme.of(context).textTheme.bodyLarge,
                 spacing: 40,
                 itemHeight: 50,
+                highlightedTextStyle: TextStyle(
+                  color: Theme.of(context).primaryColor,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+                itemWidth: 60,
                 isForce2Digits: true,
-                onTimeChange: (time) {
-                  selectedDateTime = time;
-                },
+                onTimeChange: (time) => selectedDateTime = time,
               ),
 
-              SizedBox(height: 20),
+              const SizedBox(height: 10),
 
-              // Açıklama metni
+              // Açıklama
               TextField(
                 controller: labelController,
                 decoration: InputDecoration(
                   labelText: 'Açıklama',
-                  labelStyle: TextStyle(color: Colors.white70),
+                  labelStyle: Theme.of(context).textTheme.bodyMedium,
                   enabledBorder: UnderlineInputBorder(
-                    borderSide: BorderSide(color: Colors.white30),
+                    borderSide: BorderSide(
+                      color: Theme.of(context).primaryColor,
+                    ),
                   ),
                 ),
-                style: TextStyle(color: Colors.white),
+                style: Theme.of(context).textTheme.bodyMedium,
               ),
 
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
 
-              // Tekrar seçici
+              // Tekrar Dropdown
               DropdownButtonFormField<String>(
-                dropdownColor: Colors.grey[850],
+                dropdownColor: Theme.of(context).scaffoldBackgroundColor,
                 value: repeatOption,
                 onChanged: (String? value) {
-                  if (value != null) {
-                    repeatOption = value;
-                  }
+                  if (value != null) repeatOption = value;
                 },
-                items:
-                    <String>[
-                      'Günlük',
-                      'Her Pazar',
-                      'Aylık (30\'u)',
-                    ].map<DropdownMenuItem<String>>((String value) {
-                      return DropdownMenuItem<String>(
+                items: ['Günlük', 'Her Pazar', 'Aylık (30\'u)']
+                    .map(
+                      (value) => DropdownMenuItem<String>(
                         value: value,
                         child: Text(
                           value,
-                          style: TextStyle(color: Colors.white),
+                          style: Theme.of(context).textTheme.bodyMedium,
                         ),
-                      );
-                    }).toList(),
+                      ),
+                    )
+                    .toList(),
                 decoration: InputDecoration(
                   labelText: 'Tekrar',
-                  labelStyle: TextStyle(color: Colors.white70),
+                  labelStyle: Theme.of(context).textTheme.bodyMedium,
                 ),
               ),
 
-              SizedBox(height: 20),
+              const SizedBox(height: 20),
 
               // Butonlar
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   OutlinedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: Text("İptal"),
+                    onPressed: () => Navigator.pop(context),
+                    child: Text(
+                      "İptal",
+                      style: Theme.of(context).textTheme.bodyMedium,
+                    ),
                   ),
                   ElevatedButton(
-                    onPressed: () {
-                      print(
-                        "Oluşturuldu: ${selectedDateTime.hour}:${selectedDateTime.minute}, ${labelController.text}, $repeatOption",
+                    onPressed: () async {
+                      loader.loading = true;
+                      loader.change();
+
+                      final yeniAlarm = Alarm(
+                        zaman: selectedDateTime,
+                        aciklama: labelController.text,
+                      );
+
+                      yeniAlarm.tekrar = repeatOption;
+                      yeniAlarm.isActive = true;
+                      yeniAlarm.isgider = !isgelirProvider.isGelir;
+                      yeniAlarm.alarmID = DateTime.now().millisecondsSinceEpoch
+                          .remainder(100000);
+
+                      alarmModel.alarms.add(yeniAlarm);
+
+                      final mapalarm = {
+                        'zaman': yeniAlarm.zaman.millisecondsSinceEpoch,
+                        'aciklama': yeniAlarm.aciklama,
+                        'isactive': yeniAlarm.isActive,
+                        'isgider': yeniAlarm.isgider,
+                        'tekrar': yeniAlarm.tekrar,
+                        'alarmID': yeniAlarm.alarmID,
+                      };
+                      alarmModel.alarmmap.add(mapalarm);
+                      alarmModel.savechanges();
+                      final model = getItalarms<Alarmmodel>();
+                      if (repeatOption == 'Günlük') {
+                        gunlukbildirim(
+                          yeniAlarm.zaman,
+                          yeniAlarm.alarmID,
+                          yeniAlarm.aciklama,
+                        );
+                      } else if (repeatOption == 'Her Pazar') {
+                        haftalikbildirim(
+                          yeniAlarm.zaman,
+                          yeniAlarm.alarmID,
+                          yeniAlarm.aciklama,
+                        );
+                      } else {
+                        aylikbildirim(
+                          yeniAlarm.zaman,
+                          yeniAlarm.alarmID,
+                          yeniAlarm.aciklama,
+                        );
+                      }
+
+                      debugPrint(
+                        'maplistuzunlugugu : ${model.alarmmap.length}',
                       );
                       Navigator.pop(context);
+
+                      loader.loading = false;
+                      loader.change();
                     },
-                    child: Text("Oluştur"),
+                    child: const Text(
+                      "Oluştur",
+                      style: TextStyle(color: Colors.white),
+                    ),
                   ),
                 ],
               ),
@@ -273,5 +506,178 @@ class _AlarmpageState extends State<Alarmpage> {
         );
       },
     );
+  }
+
+  Center icerikbossa(BuildContext context) {
+    return Center(
+      child: Column(
+        children: [
+          const SizedBox(height: 20),
+          SizedBox(
+            width: 150,
+            height: 150,
+            child: Image.asset(
+              'assets/loading.png',
+              color: Theme.of(context).primaryColor,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            "Kayıtlı gelir/gider bilgisi bulunamadı.",
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodyLarge,
+          ),
+          const SizedBox(height: 12),
+          Text(
+            "Şu anda kayıtlı bir gelir veya gider bulunmuyor.\nGelir/gider durumunu takip etmek için bilgi ekleyin.",
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> gunlukbildirim(
+    DateTime dateTime,
+    int bildirimID,
+    String aciklama,
+  ) async {
+    debugPrint('geliyorrrrrrr  $dateTime');
+    final tzDateTime = tz.TZDateTime.from(dateTime, tz.local);
+
+    debugPrint('tzDateTime:  $tzDateTime');
+    await flutterLocalNotificationsPlugin.zonedSchedule(
+      bildirimID,
+      'Para Root',
+      'bekleyen bir $aciklama islemin var , unutma !!!',
+      tzDateTime,
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'pararootalarms23',
+          'Para Root Alarm Bildirimleri',
+          channelDescription: 'pararootalarms',
+          importance: Importance.high,
+          priority: Priority.high,
+          playSound: true,
+          enableVibration: true,
+          icon: 'loading',
+        ),
+      ),
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      matchDateTimeComponents: DateTimeComponents.time, // her gün aynı saatte
+    );
+    debugPrint('geldiiiiiiii');
+    final prefs = await SharedPreferences.getInstance();
+
+    // Bildirim bilgilerini string formatta sakla
+    await prefs.setStringList('bildirim_$bildirimID', [
+      dateTime.toIso8601String(),
+      'gunluk',
+      aciklama,
+    ]);
+
+    debugPrint("Bildirim ID: $bildirimID, zaman: $dateTime belleğe kaydedildi");
+  }
+
+  Future<void> haftalikbildirim(
+    DateTime dateTime,
+    int bildirimID,
+    String aciklama,
+  ) async {
+    final tzDateTime = tz.TZDateTime.from(dateTime, tz.local);
+
+    await flutterLocalNotificationsPlugin.zonedSchedule(
+      bildirimID,
+      'Para Root',
+      'bekleyen bir $aciklama islemin var , unutma !!!',
+      tzDateTime,
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'pararootalarms',
+          'Para Root Alarm Bildirimleri',
+          channelDescription: 'pararootalarms',
+          importance: Importance.high,
+          priority: Priority.high,
+          playSound: true,
+          enableVibration: true,
+          icon: 'loading',
+        ),
+      ),
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      matchDateTimeComponents:
+          DateTimeComponents.dayOfWeekAndTime, // her hafta aynı saatte
+    );
+    final prefs = await SharedPreferences.getInstance();
+
+    // Bildirim bilgilerini string formatta sakla
+    await prefs.setStringList('bildirim_$bildirimID', [
+      dateTime.toIso8601String(),
+      'haftalik',
+      aciklama,
+    ]);
+
+    debugPrint("Bildirim ID: $bildirimID, zaman: $dateTime belleğe kaydedildi");
+  }
+
+  Future<void> aylikbildirim(
+    DateTime dateTime,
+    int bildirimID,
+    String aciklama,
+  ) async {
+    final tzDateTime = tz.TZDateTime.from(dateTime, tz.local);
+
+    await flutterLocalNotificationsPlugin.zonedSchedule(
+      bildirimID,
+      'Para Root',
+      'bekleyen bir $aciklama islemin var , unutma !!!',
+      tzDateTime,
+      const NotificationDetails(
+        android: AndroidNotificationDetails(
+          'pararootalarms',
+          'Para Root Alarm Bildirimleri',
+          channelDescription: 'pararootalarms',
+          importance: Importance.high,
+          priority: Priority.high,
+          playSound: true,
+          enableVibration: true,
+          icon: 'loading',
+        ),
+      ),
+      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      matchDateTimeComponents:
+          DateTimeComponents.dateAndTime, // her ay aynı saatte
+    );
+    final prefs = await SharedPreferences.getInstance();
+
+    // Bildirim bilgilerini string formatta sakla
+    await prefs.setStringList('bildirim_$bildirimID', [
+      dateTime.toIso8601String(),
+      'aylik',
+      aciklama,
+    ]);
+
+    debugPrint("Bildirim ID: $bildirimID, zaman: $dateTime belleğe kaydedildi");
+  }
+
+  Future<void> yenidenAktifEt(int bildirimID) async {
+    final prefs = await SharedPreferences.getInstance();
+    final dateStr = prefs.getStringList('bildirim_$bildirimID');
+
+    if (dateStr != null) {
+      final dateTime = DateTime.parse(dateStr[0]);
+      if (dateStr[1] == 'gunluk') {
+        await gunlukbildirim(dateTime, bildirimID, dateStr[2]);
+      } else if (dateStr[1] == 'haftalik') {
+        await haftalikbildirim(dateTime, bildirimID, dateStr[2]);
+      } else {
+        await aylikbildirim(dateTime, bildirimID, dateStr[2]);
+      }
+      debugPrint(
+        "$bildirimID ID'li ve ${dateStr[1]} tekrarli bildirim tekrar aktif edildi",
+      );
+    } else {
+      debugPrint(" Bildirim bilgisi bulunamadı");
+    }
   }
 }

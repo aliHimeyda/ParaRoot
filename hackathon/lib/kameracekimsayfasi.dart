@@ -7,11 +7,7 @@ import 'package:hackathon/firebaseServices.dart';
 import 'package:hackathon/loader.dart';
 import 'package:hackathon/main.dart';
 import 'package:hackathon/profilmodel.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'dart:io';
-import 'package:path_provider/path_provider.dart';
-import 'package:path/path.dart' as path;
 import 'package:provider/provider.dart';
 
 class KameraCekimSayfasi extends StatefulWidget {

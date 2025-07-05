@@ -2,8 +2,6 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hackathon/firebaseServices.dart';
-import 'package:hackathon/loader.dart';
 import 'package:hackathon/router.dart';
 import 'package:hackathon/veriprovider.dart';
 import 'package:provider/provider.dart';

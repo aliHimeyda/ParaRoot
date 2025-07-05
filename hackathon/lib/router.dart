@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hackathon/alarm.dart';
 import 'package:hackathon/analizsayfasi.dart';
+import 'package:hackathon/doviz.dart';
 import 'package:hackathon/gelirgidereklesayfasi.dart';
 import 'package:hackathon/hareketdetaysayfasi.dart';
 import 'package:hackathon/hareketlersayfasi.dart';
@@ -28,6 +29,7 @@ class Paths {
   static const String analizsayfasi = '/analizsayfasi';
   static const String qrsayfasi = '/qrsayfasi';
   static const String alarmpage = '/alarmpage';
+  static const String doviz = '/doviz';
 }
 
 // ignore: non_constant_identifier_names
@@ -37,9 +39,8 @@ final router = GoRouter(
   initialLocation: Paths.loadingpage,
   routes: [
     StatefulShellRoute.indexedStack(
-      builder:
-          (context, state, navigationShell) =>
-              Anasayfa(navigationShell: navigationShell),
+      builder: (context, state, navigationShell) =>
+          Anasayfa(navigationShell: navigationShell),
       branches: [
         StatefulShellBranch(
           routes: [
@@ -121,6 +122,14 @@ final router = GoRouter(
             GoRoute(
               path: Paths.alarmpage,
               builder: (context, state) => const Alarmpage(),
+            ),
+          ],
+        ),
+        StatefulShellBranch(
+          routes: [
+            GoRoute(
+              path: Paths.doviz,
+              builder: (context, state) => const Doviz(),
             ),
           ],
         ),

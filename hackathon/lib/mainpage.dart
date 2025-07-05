@@ -1,10 +1,5 @@
-// ignore_for_file: avoid_unnecessary_containers
-
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_time_picker_spinner/flutter_time_picker_spinner.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hackathon/firebaseServices.dart';
 import 'package:hackathon/router.dart';
 import 'package:hackathon/themeprovider.dart';
 import 'package:provider/provider.dart';
@@ -39,17 +34,18 @@ class _AnasayfaState extends State<Anasayfa> {
       extendBody: true,
       floatingActionButton:
           showBottomNavBar && !(currentPath == Paths.profilsayfasi)
-              ? FloatingActionButton(
-                onPressed: () {
-                  context.push(Paths.gelirgidereklesayfasi);
-                },
+          ? FloatingActionButton(
+              onPressed: () {
+                context.push(Paths.gelirgidereklesayfasi);
+              },
 
-                backgroundColor:
-                    Theme.of(context).floatingActionButtonTheme.backgroundColor,
-                shape: const CircleBorder(),
-                child: const Icon(Icons.add, color: Colors.white, size: 32),
-              )
-              : null,
+              backgroundColor: Theme.of(
+                context,
+              ).floatingActionButtonTheme.backgroundColor,
+              shape: const CircleBorder(),
+              child: const Icon(Icons.add, color: Colors.white, size: 32),
+            )
+          : null,
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       // appBar: AppBar(
       //   backgroundColor: Colors.transparent,
@@ -88,160 +84,160 @@ class _AnasayfaState extends State<Anasayfa> {
       //     ),
       //   ],
       // ),
-      bottomNavigationBar:
-          showBottomNavBar
-              ? BottomAppBar(
+      bottomNavigationBar: showBottomNavBar
+          ? BottomAppBar(
+              height: 100,
+              shape: const CircularNotchedRectangle(),
+              notchMargin: 10,
+              elevation: 0, // elevation yerine custom shadow kullandık
+              color: Theme.of(
+                context,
+              ).primaryColor, // Arka plan beyaz (#FFFFFF)
+              child: SizedBox(
                 height: 100,
-                shape: const CircularNotchedRectangle(),
-                notchMargin: 10,
-                elevation: 0, // elevation yerine custom shadow kullandık
-                color:
-                    Theme.of(context).primaryColor, // Arka plan beyaz (#FFFFFF)
-                child: SizedBox(
-                  height: 100,
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      // Ana Sayfa
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          IconButton(
-                            icon: Image.asset(
-                              'assets/homeicon.png',
-                              color:
-                                  !Provider.of<AppTheme>(
-                                        context,
-                                        listen: false,
-                                      ).isdarkmode
-                                      ? AppColors.yesil
-                                      : AppColors.siyah,
-                            ),
-                            onPressed: () {
-                              context.go(Paths.hareketler);
-                            },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    // Ana Sayfa
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          icon: Image.asset(
+                            'assets/homeicon.png',
+                            color:
+                                !Provider.of<AppTheme>(
+                                  context,
+                                  listen: false,
+                                ).isdarkmode
+                                ? AppColors.yesil
+                                : AppColors.siyah,
                           ),
-                          Text(
-                            'Ana Sayfa',
-                            style: TextStyle(
-                              color:
-                                  !Provider.of<AppTheme>(
-                                        context,
-                                        listen: false,
-                                      ).isdarkmode
-                                      ? AppColors.yesil
-                                      : AppColors.siyah,
-                            ),
+                          onPressed: () {
+                            context.go(Paths.hareketler);
+                          },
+                        ),
+                        Text(
+                          'Ana Sayfa',
+                          style: TextStyle(
+                            color:
+                                !Provider.of<AppTheme>(
+                                  context,
+                                  listen: false,
+                                ).isdarkmode
+                                ? AppColors.yesil
+                                : AppColors.siyah,
                           ),
-                        ],
-                      ),
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          IconButton(
-                            icon: Image.asset(
-                              width: 27,
-                              height: 27,
-                              'assets/alarm.png',
-                              color:
-                                  !Provider.of<AppTheme>(
-                                        context,
-                                        listen: false,
-                                      ).isdarkmode
-                                      ? AppColors.yesil
-                                      : AppColors.siyah,
-                            ),
-                            onPressed: () {
-                              context.push(Paths.alarmpage);
-                            },
+                        ),
+                      ],
+                    ),
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          icon: Image.asset(
+                            width: 27,
+                            height: 27,
+                            'assets/alarm.png',
+                            color:
+                                !Provider.of<AppTheme>(
+                                  context,
+                                  listen: false,
+                                ).isdarkmode
+                                ? AppColors.yesil
+                                : AppColors.siyah,
                           ),
-                          Text(
-                            'Alarm',
-                            style: TextStyle(
-                              color:
-                                  !Provider.of<AppTheme>(
-                                        context,
-                                        listen: false,
-                                      ).isdarkmode
-                                      ? AppColors.yesil
-                                      : AppColors.siyah,
-                            ),
+                          onPressed: () {
+                            context.push(Paths.alarmpage);
+                          },
+                        ),
+                        Text(
+                          'Alarm',
+                          style: TextStyle(
+                            color:
+                                !Provider.of<AppTheme>(
+                                  context,
+                                  listen: false,
+                                ).isdarkmode
+                                ? AppColors.yesil
+                                : AppColors.siyah,
                           ),
-                        ],
-                      ),
-                      const SizedBox(width: 50), // Ortadaki buton boşluğu
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          IconButton(
-                            icon: Image.asset(
-                              width: 27,
-                              height: 27,
-                              'assets/limit.png',
-                              color:
-                                  !Provider.of<AppTheme>(
-                                        context,
-                                        listen: false,
-                                      ).isdarkmode
-                                      ? AppColors.yesil
-                                      : AppColors.siyah,
-                            ),
-                            onPressed: () {
-                              context.go(Paths.hareketler);
-                            },
+                        ),
+                      ],
+                    ),
+                    const SizedBox(width: 50), // Ortadaki buton boşluğu
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          icon: Image.asset(
+                            width: 27,
+                            height: 27,
+                            'assets/doviz.png',
+                            color:
+                                !Provider.of<AppTheme>(
+                                  context,
+                                  listen: false,
+                                ).isdarkmode
+                                ? AppColors.yesil
+                                : AppColors.siyah,
                           ),
-                          Text(
-                            'Limit',
-                            style: TextStyle(
-                              color:
-                                  !Provider.of<AppTheme>(
-                                        context,
-                                        listen: false,
-                                      ).isdarkmode
-                                      ? AppColors.yesil
-                                      : AppColors.siyah,
-                            ),
+                          onPressed: () {
+                            context.push(Paths.doviz);
+                          },
+                        ),
+                        Text(
+                          'Doviz',
+                          style: TextStyle(
+                            color:
+                                !Provider.of<AppTheme>(
+                                  context,
+                                  listen: false,
+                                ).isdarkmode
+                                ? AppColors.yesil
+                                : AppColors.siyah,
                           ),
-                        ],
-                      ),
-                      // Profil
-                      Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          IconButton(
-                            icon: Image.asset(
-                              'assets/profilicon.png',
-                              color:
-                                  !Provider.of<AppTheme>(
-                                        context,
-                                        listen: false,
-                                      ).isdarkmode
-                                      ? AppColors.yesil
-                                      : AppColors.siyah,
-                            ),
-                            onPressed: () async {
-                              context.push(Paths.profilsayfasi);
-                            },
+                        ),
+                      ],
+                    ),
+                    // Profil
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        IconButton(
+                          icon: Image.asset(
+                            'assets/profilicon.png',
+                            color:
+                                !Provider.of<AppTheme>(
+                                  context,
+                                  listen: false,
+                                ).isdarkmode
+                                ? AppColors.yesil
+                                : AppColors.siyah,
                           ),
-                          Text(
-                            'Profil',
-                            style: TextStyle(
-                              color:
-                                  !Provider.of<AppTheme>(
-                                        context,
-                                        listen: false,
-                                      ).isdarkmode
-                                      ? AppColors.yesil
-                                      : AppColors.siyah,
-                            ),
+                          onPressed: () async {
+                            context.push(Paths.profilsayfasi);
+                          },
+                        ),
+                        Text(
+                          'Profil',
+                          style: TextStyle(
+                            color:
+                                !Provider.of<AppTheme>(
+                                  context,
+                                  listen: false,
+                                ).isdarkmode
+                                ? AppColors.yesil
+                                : AppColors.siyah,
                           ),
-                        ],
-                      ),
-                    ],
-                  ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              )
-              : null, // Eğer BottomNavigationBar gösterilmeyecekse, null döndür
+              ),
+            )
+          : null, // Eğer BottomNavigationBar gösterilmeyecekse, null döndür
       body: widget.navigationShell,
       backgroundColor: Colors.white,
     );

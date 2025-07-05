@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:hackathon/firebaseServices.dart';
 import 'package:hackathon/hareketmodel.dart';
 import 'package:hackathon/router.dart';
 import 'package:hackathon/themeprovider.dart';

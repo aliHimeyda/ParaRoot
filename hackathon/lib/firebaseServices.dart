@@ -10,7 +10,6 @@ import 'package:hackathon/loader.dart';
 import 'package:hackathon/main.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
-import 'package:provider/provider.dart';
 
 class Firebaseservices {
   static User? currentuser;
