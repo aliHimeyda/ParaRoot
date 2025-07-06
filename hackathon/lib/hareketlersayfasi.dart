@@ -55,8 +55,8 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
           appBar: PreferredSize(
             preferredSize: Size.fromHeight(140),
             child: AppBar(
-              surfaceTintColor: Theme.of(context).primaryColor,
-              backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+              surfaceTintColor: Theme.of(context).scaffoldBackgroundColor,
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               elevation: 0,
               flexibleSpace: Padding(
                 padding: const EdgeInsets.only(top: 40.0),
@@ -144,7 +144,17 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
                     );
                   } else if (index ==
                       context.watch<Veriprovider>().veri.length + 1) {
-                    return SizedBox(height: 150);
+                    return Container(
+                      height: 155,
+                      decoration: BoxDecoration(
+                        border: Border(
+                          top: BorderSide(
+                            width: 0.4,
+                            color: Theme.of(context).primaryColor,
+                          ),
+                        ),
+                      ),
+                    );
                   } else {
                     final HareketModel hareket = HareketModel(
                       id: context.watch<Veriprovider>().veri[index - 1]!['ID'],
@@ -366,7 +376,9 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
                   decoration: BoxDecoration(
                     color: isSelected
                         ? Theme.of(context).primaryColor
-                        : Theme.of(context).scaffoldBackgroundColor,
+                        : context.watch<AppTheme>().isdarkmode
+                        ? Theme.of(context).scaffoldBackgroundColor
+                        : Theme.of(context).secondaryHeaderColor,
                     borderRadius: BorderRadius.only(
                       topLeft: index == 0
                           ? const Radius.circular(12)
@@ -408,7 +420,9 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
           Container(
             width: 44,
             decoration: BoxDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
+              color: context.watch<AppTheme>().isdarkmode
+                  ? Theme.of(context).scaffoldBackgroundColor
+                  : Theme.of(context).secondaryHeaderColor,
               borderRadius: BorderRadius.only(
                 topRight: Radius.circular(12),
                 bottomRight: Radius.circular(12),
