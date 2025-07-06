@@ -3,13 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:hackathon/router.dart';
+import 'package:hackathon/themeprovider.dart';
 import 'package:hackathon/veriprovider.dart';
 import 'package:provider/provider.dart';
 
 class Analizsayfasi extends StatefulWidget {
-  const Analizsayfasi({
-    super.key,
-  });
+  const Analizsayfasi({super.key});
 
   @override
   State<Analizsayfasi> createState() => _AnalizsayfasiState();
@@ -19,142 +18,134 @@ class _AnalizsayfasiState extends State<Analizsayfasi> {
   @override
   Widget build(BuildContext context) {
     late double kiralar = 0;
-          late double faturalar = 0;
-          late double yemek = 0;
-          late double Yatirim = 0;
-          late double digergider = 0;
-          late double maas = 0;
-          late double burs = 0;
-          late double yangelir = 0;
-          late double digergelir = 0;
-          late double toplamgelir = 0;
-          late double toplamgider = 0;
-          if (context.watch<Veriprovider>().veri.isNotEmpty) {
-            for (Map<String, dynamic>? veri in context.watch<Veriprovider>().veri) {
-              if (veri!['gidermi']) {
-                if (veri['gelirturu'] == 'kiralar') {
-                  kiralar++;
-                  toplamgider += veri['deger'];
-                } else if (veri['gelirturu'] == 'faturalar') {
-                  toplamgider += veri['deger'];
-                  faturalar++;
-                } else if (veri['gelirturu'] == 'yemek') {
-                  toplamgider += veri['deger'];
-                  yemek++;
-                } else if (veri['gelirturu'] == 'Yatirim') {
-                  toplamgider += veri['deger'];
-                  Yatirim++;
-                } else {
-                  toplamgider += veri['deger'];
-                  digergider++;
-                }
-              } else {
-                if (veri['gelirturu'] == 'maas') {
-                  toplamgelir += veri['deger'];
-                  maas++;
-                } else if (veri['gelirturu'] == 'burs') {
-                  toplamgelir += veri['deger'];
-                  burs++;
-                } else if (veri['gelirturu'] == 'yangelir') {
-                  toplamgelir += veri['deger'];
-                  yangelir++;
-                } else {
-                  toplamgelir += veri['deger'];
-                  digergelir++;
-                }
-              }
-            }
+    late double faturalar = 0;
+    late double yemek = 0;
+    late double Yatirim = 0;
+    late double digergider = 0;
+    late double maas = 0;
+    late double burs = 0;
+    late double yangelir = 0;
+    late double digergelir = 0;
+    late double toplamgelir = 0;
+    late double toplamgider = 0;
+    if (context.watch<Veriprovider>().veri.isNotEmpty) {
+      for (Map<String, dynamic>? veri in context.watch<Veriprovider>().veri) {
+        if (veri!['gidermi']) {
+          if (veri['gelirturu'] == 'kiralar') {
+            kiralar++;
+            toplamgider += veri['deger'];
+          } else if (veri['gelirturu'] == 'faturalar') {
+            toplamgider += veri['deger'];
+            faturalar++;
+          } else if (veri['gelirturu'] == 'yemek') {
+            toplamgider += veri['deger'];
+            yemek++;
+          } else if (veri['gelirturu'] == 'Yatirim') {
+            toplamgider += veri['deger'];
+            Yatirim++;
+          } else {
+            toplamgider += veri['deger'];
+            digergider++;
           }
+        } else {
+          if (veri['gelirturu'] == 'maas') {
+            toplamgelir += veri['deger'];
+            maas++;
+          } else if (veri['gelirturu'] == 'burs') {
+            toplamgelir += veri['deger'];
+            burs++;
+          } else if (veri['gelirturu'] == 'yangelir') {
+            toplamgelir += veri['deger'];
+            yangelir++;
+          } else {
+            toplamgelir += veri['deger'];
+            digergelir++;
+          }
+        }
+      }
+    }
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      body:  Padding(
-            padding: const EdgeInsets.only(top: 12),
-            child: ListView(
-              children: [
-                Center(
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width - 50,
-                    child:
-                        buildCard(
-                              children: [
-                                buildRow(
-                                  'Gelir Dagilim Grafigi',
-                                  '',
-                                  bold: true,
-                                ),
-                                Divider(color: Theme.of(context).primaryColor),
-                                gelirbuildPieChart(
-                                  maas,
-                                  burs,
-                                  yangelir,
-                                  digergelir,
-                                ),
-                                SizedBox(height: 5),
-                                Divider(color: Theme.of(context).primaryColor),
-                                buildRow('Genel Bakis:', ''),
-                                buildRow(
-                                  'Toplam Gelir:',
-                                  '$toplamgelir',
-                                  bold: true,
-                                  color: Theme.of(context).primaryColor,
-                                ),
-                                SizedBox(height: 2),
-                                Text(
-                                  'Gelirinizin artis ivmesini arttirmak icin , Yan Gelir"den gelen orani arttirmanizi oneririz',
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                ),
-                              ],
-                            )
-                            .animate()
-                            .fade()
-                            .blur(begin: Offset(10, 10), end: Offset(0, 0))
-                            .moveX(),
-                  ),
-                ),
-                Center(
-                  child: SizedBox(
-                    width: MediaQuery.of(context).size.width - 50,
-                    child:
-                        buildCard(
-                              children: [
-                                buildRow(
-                                  'Gider Dagilim Grafigi',
-                                  '',
-                                  bold: true,
-                                ),
-                                Divider(color: Theme.of(context).primaryColor),
-                                giderbuildPieChart(
-                                  kiralar,
-                                  faturalar,
-                                  yemek,
-                                  Yatirim,
-                                  digergider,
-                                ),
-                                SizedBox(height: 5),
-                                Divider(color: Theme.of(context).primaryColor),
-                                buildRow('Genel Bakis:', ''),
-                                buildRow(
-                                  'Toplam Gider:',
-                                  '$toplamgider',
-                                  bold: true,
-                                  color: Theme.of(context).primaryColor,
-                                ),
-                                SizedBox(height: 2),
-                                Text(
-                                  'Giderinizdeki artis ivmesini azaltmak icin , Diger"den gelen orani azaltmanizi oneririz...\nAyrica ,Yatirima giden her kurusun gelirinize katki olarak yansiyacagini unutmayin',
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                ),
-                              ],
-                            )
-                            .animate(delay: Duration(milliseconds: 300))
-                            .fade()
-                            .blur(begin: Offset(10, 10), end: Offset(0, 0))
-                            .moveX(),
-                  ),
-                ),
-              ],
+      body: Padding(
+        padding: const EdgeInsets.only(top: 12),
+        child: ListView(
+          children: [
+            Center(
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width - 50,
+                child:
+                    buildCard(
+                          children: [
+                            buildRow('Gelir Dagilim Grafigi', '', bold: true),
+                            Divider(color: Theme.of(context).primaryColor),
+                            gelirbuildPieChart(
+                              maas,
+                              burs,
+                              yangelir,
+                              digergelir,
+                            ),
+                            SizedBox(height: 5),
+                            Divider(color: Theme.of(context).primaryColor),
+                            buildRow('Genel Bakis:', ''),
+                            buildRow(
+                              'Toplam Gelir:',
+                              '$toplamgelir',
+                              bold: true,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                            SizedBox(height: 2),
+                            Text(
+                              'Gelirinizin artis ivmesini arttirmak icin , Yan Gelir"den gelen orani arttirmanizi oneririz',
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ],
+                        )
+                        .animate()
+                        .fade()
+                        .blur(begin: Offset(10, 10), end: Offset(0, 0))
+                        .moveX(),
+              ),
             ),
-          ),
+            Center(
+              child: SizedBox(
+                width: MediaQuery.of(context).size.width - 50,
+                child:
+                    buildCard(
+                          children: [
+                            buildRow('Gider Dagilim Grafigi', '', bold: true),
+                            Divider(color: Theme.of(context).primaryColor),
+                            giderbuildPieChart(
+                              kiralar,
+                              faturalar,
+                              yemek,
+                              Yatirim,
+                              digergider,
+                            ),
+                            SizedBox(height: 5),
+                            Divider(color: Theme.of(context).primaryColor),
+                            buildRow('Genel Bakis:', ''),
+                            buildRow(
+                              'Toplam Gider:',
+                              '$toplamgider',
+                              bold: true,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                            SizedBox(height: 2),
+                            Text(
+                              'Giderinizdeki artis ivmesini azaltmak icin , Diger"den gelen orani azaltmanizi oneririz...\nAyrica ,Yatirima giden her kurusun gelirinize katki olarak yansiyacagini unutmayin',
+                              style: Theme.of(context).textTheme.bodyMedium,
+                            ),
+                          ],
+                        )
+                        .animate(delay: Duration(milliseconds: 300))
+                        .fade()
+                        .blur(begin: Offset(10, 10), end: Offset(0, 0))
+                        .moveX(),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -172,13 +163,12 @@ class _AnalizsayfasiState extends State<Analizsayfasi> {
         children: [
           Text(
             label,
-            style:
-                bold
-                    ? TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).primaryColor,
-                    )
-                    : null,
+            style: bold
+                ? TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).primaryColor,
+                  )
+                : null,
           ),
           Text(value, style: TextStyle(color: valueColor ?? color)),
         ],
@@ -493,7 +483,19 @@ class _AnalizsayfasiState extends State<Analizsayfasi> {
 
   Widget buildCard({required List<Widget> children}) {
     return Card(
-      color: Theme.of(context).secondaryHeaderColor,
+      color: context.watch<AppTheme>().isdarkmode
+          ? Theme.of(context).scaffoldBackgroundColor
+          : Theme.of(context).secondaryHeaderColor,
+      shape: context.watch<AppTheme>().isdarkmode
+          ? RoundedRectangleBorder(
+              side: BorderSide(
+                color: Theme.of(context).primaryColor, // Kenarlık rengi
+                width: 1, // Kenarlık kalınlığı
+              ),
+              borderRadius: BorderRadius.circular(10),
+            )
+          : null,
+
       margin: EdgeInsets.symmetric(vertical: 8),
       child: Padding(
         padding: EdgeInsets.all(12),

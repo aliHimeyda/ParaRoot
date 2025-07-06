@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'dart:ffi';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:hackathon/loader.dart';
+import 'package:hackathon/themeprovider.dart';
 
 import 'package:http/http.dart' as http;
 import 'package:intl/intl.dart';
@@ -95,11 +97,10 @@ Future<Map<String, dynamic>> fetchLast30DaysRatesWithAltin(
   return {'Altın': gramAltin, 'Kurlar': ratesList};
 }
 
-class PriceData {
-  final DateTime date;
-  final double price;
-
-  PriceData(this.date, this.price);
+class ChartData {
+  ChartData(this.x, this.y);
+  final DateTime x;
+  final double y;
 }
 
 class Doviz extends StatefulWidget {
@@ -110,20 +111,18 @@ class Doviz extends StatefulWidget {
 }
 
 class _DovizState extends State<Doviz> {
+  late CrosshairBehavior _crosshairBehavior;
   late Future<Map<String, dynamic>?> datagetir;
-  final List<PriceData> data = [
-    PriceData(DateTime(2025, 6, 10), 3.7850),
-    PriceData(DateTime(2025, 6, 20), 3.7835),
-    PriceData(DateTime(2025, 7, 1), 3.7860),
-    PriceData(DateTime(2025, 7, 10), 3.7842),
-    PriceData(DateTime(2025, 7, 20), 3.7875),
-    PriceData(DateTime(2025, 8, 1), 3.7856),
-    PriceData(DateTime(2025, 8, 10), 3.7868),
-    PriceData(DateTime(2025, 8, 20), 3.7840),
-  ];
 
   @override
   void initState() {
+    _crosshairBehavior = CrosshairBehavior(
+      enable: true,
+      activationMode: ActivationMode.longPress,
+      lineType: CrosshairLineType.both,
+      lineWidth: 1,
+      lineColor: Colors.grey[700],
+    );
     super.initState();
     datagetir = fetchLast30DaysRatesWithAltin(
       'API_KEY12OV2ZXBOXON1DICGCBUZQ8I4D7R5CMJ',
@@ -134,9 +133,13 @@ class _DovizState extends State<Doviz> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        surfaceTintColor: Theme.of(context).primaryColor,
         title: Text(
           'Doviz Fiyatlari',
           style: Theme.of(context).textTheme.bodyLarge,
+        ),
+        iconTheme: IconThemeData(
+          color: Theme.of(context).textTheme.bodyLarge!.color, // Geri ok rengi
         ),
       ),
       body: FutureBuilder<Map<String, dynamic>?>(
@@ -150,18 +153,18 @@ class _DovizState extends State<Doviz> {
             return icerikbossa(context);
           }
           final items = snapshot.data!['Kurlar'];
-          late List<PriceData> usddata = [];
-          late List<PriceData> eurodata = [];
+          late List<ChartData> usddata = [];
+          late List<ChartData> eurodata = [];
 
           for (Map<String, dynamic> item in items) {
-            final price = PriceData(
+            final price = ChartData(
               DateFormat('dd.MM.yyyy').parse(item['Tarih']),
               double.parse(item['USD Satış']),
             );
             usddata.add(price);
           }
           for (Map<String, dynamic> item in items) {
-            final price = PriceData(
+            final price = ChartData(
               DateFormat('dd.MM.yyyy').parse(item['Tarih']),
               double.parse(item['EUR Satış']),
             );
@@ -170,62 +173,267 @@ class _DovizState extends State<Doviz> {
 
           return ListView(
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+              buildCard(
                 children: [
-                  Text(
-                    '${items[0]['Tarih']}',
-                    style: TextStyle(fontWeight: FontWeight.bold),
+                  buildRow(
+                    'Guncellenme Tarihi :',
+                    items[0]['Tarih'],
+                    bold: true,
+                    color: Theme.of(context).primaryColor,
                   ),
-                  ListTile(
-                    title: Text('USD Alış: ${items[0]['USD Alış']}'),
-                    trailing: Text('USD Satış: ${items[0]['USD Satış']} TL'),
-                  ),
-                  ListTile(
-                    title: Text('EUR Alış: ${items[0]['EUR Alış']}'),
-                    trailing: Text('EUR Satış: ${items[0]['EUR Satış']} TL'),
-                  ),
-
-                  ListTile(title: Text('Altın: ${snapshot.data!['Altın']}')),
-                  Divider(),
                 ],
               ),
-              Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: SfCartesianChart(
-                  primaryXAxis: DateTimeAxis(),
-                  primaryYAxis: NumericAxis(),
-                  tooltipBehavior: TooltipBehavior(enable: true),
-                  series: <CartesianSeries>[
-                    ColumnSeries<PriceData, DateTime>(
-                      dataSource: usddata,
-                      xValueMapper: (PriceData p, _) => p.date,
-                      yValueMapper: (PriceData p, _) => p.price,
-                      name: 'Altın',
-                      color: Colors.brown,
-                      dataLabelSettings: DataLabelSettings(isVisible: false),
-                    ),
-                  ],
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(12.0),
-                child: SfCartesianChart(
-                  primaryXAxis: DateTimeAxis(),
-                  primaryYAxis: NumericAxis(),
-                  tooltipBehavior: TooltipBehavior(enable: true),
-                  series: <CartesianSeries>[
-                    ColumnSeries<PriceData, DateTime>(
-                      dataSource: eurodata,
-                      xValueMapper: (PriceData p, _) => p.date,
-                      yValueMapper: (PriceData p, _) => p.price,
-                      name: 'Altın',
-                      color: Colors.brown,
-                      dataLabelSettings: DataLabelSettings(isVisible: false),
-                    ),
-                  ],
-                ),
-              ),
+              buildCard(
+                    children: [
+                      buildRow('USD ', '', bold: true),
+                      Divider(color: Theme.of(context).primaryColor),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Column(
+                            children: [
+                              buildRow('Alış:', '', bold: true),
+                              Text(
+                                items[0]['USD Alış'],
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(
+                                    context,
+                                  ).textTheme.bodyLarge!.color,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Container(
+                            width: 1, // kalınlık
+                            height: 40, // yükseklik
+                            color: Theme.of(context).primaryColor,
+                          ),
+                          Column(
+                            children: [
+                              buildRow('Satış:', '', bold: true),
+                              Text(
+                                items[0]['USD Satış'],
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(
+                                    context,
+                                  ).textTheme.bodyLarge!.color,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      Divider(color: Theme.of(context).primaryColor),
+                      Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: SfCartesianChart(
+                          title: ChartTitle(
+                            text: '30 Günlük Dağılım (USD)',
+                            textStyle: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          ),
+                          primaryXAxis: DateTimeAxis(
+                            axisLine: AxisLine(
+                              color: Theme.of(
+                                context,
+                              ).primaryColor, // X ekseni çizgi rengi
+                            ),
+                            labelStyle: TextStyle(
+                              color: Theme.of(
+                                context,
+                              ).primaryColor, // X ekseni etiket (tarih) rengi
+                            ),
+                          ),
+                          primaryYAxis: NumericAxis(
+                            axisLine: AxisLine(
+                              color: Theme.of(
+                                context,
+                              ).primaryColor, // Y ekseni çizgi rengi
+                            ),
+                            labelStyle: TextStyle(
+                              color: Theme.of(
+                                context,
+                              ).primaryColor, // Y ekseni etiket (sayı) rengi
+                            ),
+                            majorGridLines: MajorGridLines(
+                              color: Theme.of(context).cardColor,
+                            ),
+                          ),
+
+                          crosshairBehavior: _crosshairBehavior,
+                          series: <CartesianSeries>[
+                            LineSeries<ChartData, DateTime>(
+                              dataSource: usddata,
+                              xValueMapper: (ChartData data, _) => data.x,
+                              yValueMapper: (ChartData data, _) => data.y,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  )
+                  .animate()
+                  .fade()
+                  .blur(begin: Offset(10, 10), end: Offset(0, 0))
+                  .moveX(),
+              buildCard(
+                    children: [
+                      buildRow('EUR ', '', bold: true),
+                      Divider(color: Theme.of(context).primaryColor),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Column(
+                            children: [
+                              buildRow('Alış:', '', bold: true),
+                              Text(
+                                items[0]['EUR Alış'],
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(
+                                    context,
+                                  ).textTheme.bodyLarge!.color,
+                                ),
+                              ),
+                            ],
+                          ),
+                          Container(
+                            width: 1, // kalınlık
+                            height: 40, // yükseklik
+                            color: Theme.of(context).primaryColor,
+                          ),
+                          Column(
+                            children: [
+                              buildRow('Satış:', '', bold: true),
+                              Text(
+                                items[0]['EUR Satış'],
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  fontWeight: FontWeight.bold,
+                                  color: Theme.of(
+                                    context,
+                                  ).textTheme.bodyLarge!.color,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                      Divider(color: Theme.of(context).primaryColor),
+                      Padding(
+                        padding: const EdgeInsets.all(8),
+                        child: SfCartesianChart(
+                          title: ChartTitle(
+                            text: '30 Günlük Dağılım (EUR)',
+                            textStyle: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          ),
+                          primaryXAxis: DateTimeAxis(
+                            axisLine: AxisLine(
+                              color: Theme.of(
+                                context,
+                              ).primaryColor, // X ekseni çizgi rengi
+                            ),
+                            labelStyle: TextStyle(
+                              color: Theme.of(
+                                context,
+                              ).primaryColor, // X ekseni etiket (tarih) rengi
+                            ),
+                          ),
+                          primaryYAxis: NumericAxis(
+                            axisLine: AxisLine(
+                              color: Theme.of(
+                                context,
+                              ).primaryColor, // Y ekseni çizgi rengi
+                            ),
+                            labelStyle: TextStyle(
+                              color: Theme.of(
+                                context,
+                              ).primaryColor, // Y ekseni etiket (sayı) rengi
+                            ),
+                            majorGridLines: MajorGridLines(
+                              color: Theme.of(context).cardColor,
+                            ),
+                          ),
+
+                          crosshairBehavior: _crosshairBehavior,
+                          series: <CartesianSeries>[
+                            LineSeries<ChartData, DateTime>(
+                              dataSource: eurodata,
+                              xValueMapper: (ChartData data, _) => data.x,
+                              yValueMapper: (ChartData data, _) => data.y,
+                              color: Theme.of(context).primaryColor,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  )
+                  .animate()
+                  .fade()
+                  .blur(begin: Offset(10, 10), end: Offset(0, 0))
+                  .moveX(),
+
+              buildCard(
+                    children: [
+                      buildRow('Altın ', '', bold: true),
+                      Divider(color: Theme.of(context).primaryColor),
+                      buildRow(
+                        'Gram Altın =',
+                        snapshot.data!['Altın'],
+                        bold: true,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ],
+                  )
+                  .animate()
+                  .fade()
+                  .blur(begin: Offset(10, 10), end: Offset(0, 0))
+                  .moveX(),
+
+              buildCard(
+                    children: [
+                      buildRow('Kaynak ', '', bold: true),
+                      Divider(color: Theme.of(context).primaryColor),
+                      buildRow(
+                        'USD ve EUR :',
+                        'Türkiye Cumhuriyet Merkez Bankası',
+                        bold: true,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      buildRow(
+                        '',
+                        '(www.tcmb.gov.tr)',
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      buildRow(
+                        'Altın :',
+                        'Finage LTD  (https://finage.co.uk/)',
+                        bold: true,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                    ],
+                  )
+                  .animate()
+                  .fade()
+                  .blur(begin: Offset(10, 10), end: Offset(0, 0))
+                  .moveX(),
+
+              SizedBox(height: 30),
             ],
           );
         },
@@ -307,7 +515,19 @@ class _DovizState extends State<Doviz> {
 
   Widget buildCard({required List<Widget> children}) {
     return Card(
-      color: Theme.of(context).secondaryHeaderColor,
+      color: context.watch<AppTheme>().isdarkmode
+          ? Theme.of(context).scaffoldBackgroundColor
+          : Theme.of(context).secondaryHeaderColor,
+      shape: context.watch<AppTheme>().isdarkmode
+          ? RoundedRectangleBorder(
+              side: BorderSide(
+                color: Theme.of(context).primaryColor, // Kenarlık rengi
+                width: 1, // Kenarlık kalınlığı
+              ),
+              borderRadius: BorderRadius.circular(10),
+            )
+          : null,
+
       margin: EdgeInsets.symmetric(vertical: 8),
       child: Padding(
         padding: EdgeInsets.all(12),
