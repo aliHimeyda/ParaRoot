@@ -33,7 +33,9 @@ class _AnasayfaState extends State<Anasayfa> {
     return Scaffold(
       extendBody: true,
       floatingActionButton:
-          showBottomNavBar && !(currentPath == Paths.profilsayfasi)
+          showBottomNavBar &&
+              !(currentPath == Paths.profilsayfasi) &&
+              !(currentPath == Paths.doviz)
           ? FloatingActionButton(
               onPressed: () {
                 context.push(Paths.gelirgidereklesayfasi);
@@ -104,14 +106,10 @@ class _AnasayfaState extends State<Anasayfa> {
                       children: [
                         IconButton(
                           icon: Image.asset(
+                            width: 27,
+                            height: 27,
                             'assets/homeicon.png',
-                            color:
-                                !Provider.of<AppTheme>(
-                                  context,
-                                  listen: false,
-                                ).isdarkmode
-                                ? AppColors.yesil
-                                : AppColors.siyah,
+                            color: Theme.of(context).secondaryHeaderColor,
                           ),
                           onPressed: () {
                             context.go(Paths.hareketler);
@@ -120,13 +118,7 @@ class _AnasayfaState extends State<Anasayfa> {
                         Text(
                           'Ana Sayfa',
                           style: TextStyle(
-                            color:
-                                !Provider.of<AppTheme>(
-                                  context,
-                                  listen: false,
-                                ).isdarkmode
-                                ? AppColors.yesil
-                                : AppColors.siyah,
+                            color: Theme.of(context).secondaryHeaderColor,
                           ),
                         ),
                       ],
@@ -139,13 +131,7 @@ class _AnasayfaState extends State<Anasayfa> {
                             width: 27,
                             height: 27,
                             'assets/alarm.png',
-                            color:
-                                !Provider.of<AppTheme>(
-                                  context,
-                                  listen: false,
-                                ).isdarkmode
-                                ? AppColors.yesil
-                                : AppColors.siyah,
+                            color: Theme.of(context).secondaryHeaderColor,
                           ),
                           onPressed: () {
                             context.push(Paths.alarmpage);
@@ -154,13 +140,7 @@ class _AnasayfaState extends State<Anasayfa> {
                         Text(
                           'Alarm',
                           style: TextStyle(
-                            color:
-                                !Provider.of<AppTheme>(
-                                  context,
-                                  listen: false,
-                                ).isdarkmode
-                                ? AppColors.yesil
-                                : AppColors.siyah,
+                            color: Theme.of(context).secondaryHeaderColor,
                           ),
                         ),
                       ],
@@ -206,6 +186,8 @@ class _AnasayfaState extends State<Anasayfa> {
                       children: [
                         IconButton(
                           icon: Image.asset(
+                            width: 27,
+                            height: 27,
                             'assets/profilicon.png',
                             color:
                                 !Provider.of<AppTheme>(
@@ -222,13 +204,7 @@ class _AnasayfaState extends State<Anasayfa> {
                         Text(
                           'Profil',
                           style: TextStyle(
-                            color:
-                                !Provider.of<AppTheme>(
-                                  context,
-                                  listen: false,
-                                ).isdarkmode
-                                ? AppColors.yesil
-                                : AppColors.siyah,
+                            color: Theme.of(context).secondaryHeaderColor,
                           ),
                         ),
                       ],

@@ -515,9 +515,7 @@ class _DovizState extends State<Doviz> {
 
   Widget buildCard({required List<Widget> children}) {
     return Card(
-      color: context.watch<AppTheme>().isdarkmode
-          ? Theme.of(context).scaffoldBackgroundColor
-          : Theme.of(context).secondaryHeaderColor,
+      color:  Theme.of(context).secondaryHeaderColor,
       shape: context.watch<AppTheme>().isdarkmode
           ? RoundedRectangleBorder(
               side: BorderSide(

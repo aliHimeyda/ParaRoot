@@ -55,8 +55,8 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
           appBar: PreferredSize(
             preferredSize: Size.fromHeight(140),
             child: AppBar(
-              surfaceTintColor: Theme.of(context).scaffoldBackgroundColor,
-              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+              surfaceTintColor: Theme.of(context).secondaryHeaderColor,
+              backgroundColor: Theme.of(context).secondaryHeaderColor,
               elevation: 0,
               flexibleSpace: Padding(
                 padding: const EdgeInsets.only(top: 40.0),
@@ -104,7 +104,26 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
                       ],
                     ),
                     const SizedBox(height: 10),
-                    buildFilterTabs(),
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Theme.of(context).secondaryHeaderColor,
+                        borderRadius: BorderRadius.all(Radius.circular(10)),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(
+                              0.2,
+                            ), // Yarı saydam siyah
+                            offset: Offset(4, 4), // X: sağa, Y: aşağı
+                            blurRadius: 5, // Yumuşaklık
+                            spreadRadius: 2, // Genişleme
+                          ),
+                        ],
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.only(left: 20, right: 8),
+                        child: buildFilterTabs(),
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -127,23 +146,9 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
 
               return ListView.builder(
                 padding: const EdgeInsets.symmetric(horizontal: 20),
-                itemCount: context.watch<Veriprovider>().veri.length + 2,
+                itemCount: context.watch<Veriprovider>().veri.length + 1,
                 itemBuilder: (context, index) {
-                  if (index == 0) {
-                    return Column(
-                      children: [
-                        Align(
-                          alignment: Alignment.topLeft,
-                          child: Text(
-                            "Hareketler",
-                            style: Theme.of(context).textTheme.titleLarge,
-                          ),
-                        ),
-                        const SizedBox(height: 32),
-                      ],
-                    );
-                  } else if (index ==
-                      context.watch<Veriprovider>().veri.length + 1) {
+                  if (index == context.watch<Veriprovider>().veri.length) {
                     return Container(
                       height: 155,
                       decoration: BoxDecoration(
@@ -157,47 +162,47 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
                     );
                   } else {
                     final HareketModel hareket = HareketModel(
-                      id: context.watch<Veriprovider>().veri[index - 1]!['ID'],
+                      id: context.watch<Veriprovider>().veri[index]!['ID'],
                       tarih: context
                           .watch<Veriprovider>()
-                          .veri[index - 1]!['tarih']
+                          .veri[index]!['tarih']
                           .toDate(),
                       gidermi: context
                           .watch<Veriprovider>()
-                          .veri[index - 1]!['gidermi'],
+                          .veri[index]!['gidermi'],
                       baslik: context
                           .watch<Veriprovider>()
-                          .veri[index - 1]!['baslik'],
+                          .veri[index]!['baslik'],
                       gelirTarihi: context
                           .watch<Veriprovider>()
-                          .veri[index - 1]!['tarih']
+                          .veri[index]!['tarih']
                           .toDate()
                           .toString(),
                       gelirTuru: context
                           .watch<Veriprovider>()
-                          .veri[index - 1]!['gelirturu'],
+                          .veri[index]!['gelirturu'],
                       deger: context
                           .watch<Veriprovider>()
-                          .veri[index - 1]!['deger'],
+                          .veri[index]!['deger'],
                       aciklama: context
                           .watch<Veriprovider>()
-                          .veri[index - 1]!['aciklama'],
+                          .veri[index]!['aciklama'],
                       imageAssetPath: context
                           .watch<Veriprovider>()
-                          .veri[index - 1]!['imageUrl'],
+                          .veri[index]!['imageUrl'],
                     );
                     late bool aynitarihmi = false;
-                    if ((index - 2) >= 0) {
+                    if ((index - 1) >= 0) {
                       if (DateFormat('d').format(
                             context
                                 .watch<Veriprovider>()
-                                .veri[index - 1]!['tarih']
+                                .veri[index]!['tarih']
                                 .toDate(),
                           ) ==
                           DateFormat('d').format(
                             context
                                 .watch<Veriprovider>()
-                                .veri[index - 2]!['tarih']
+                                .veri[index - 1]!['tarih']
                                 .toDate(),
                           )) {
                         aynitarihmi = true;
@@ -217,7 +222,7 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
                           Provider.of<Veriprovider>(
                             context,
                             listen: false,
-                          ).veri[index - 1],
+                          ).veri[index],
                         );
                         getIt<Loader>().loading = false;
                         getIt<Loader>().change();
@@ -288,284 +293,148 @@ class _HareketlersayfasiState extends State<Hareketlersayfasi> {
   Widget buildFilterTabs() {
     final List<String> labels = ['Bu Ay', 'Geçen Ay', 'Son 3 Ay'];
 
-    return Container(
-      height: 44,
-      decoration: BoxDecoration(
-        border: Border.all(color: Theme.of(context).primaryColor),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        children: [
-          ...List.generate(labels.length, (index) {
-            final bool isSelected = selectedIndex == index;
-            return Expanded(
-              child: GestureDetector(
-                onTap: () async {
-                  final now = DateTime.now();
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text("Hareketler", style: Theme.of(context).textTheme.titleLarge),
+        // Sol filtre butonu
+        Row(
+          children: [
+            PopupMenuButton<int>(
+              onSelected: (index) async {
+                final now = DateTime.now();
 
-                  if (index == 0) {
-                    // Bu ay
+                if (index == 0) {
+                  Provider.of<Veriprovider>(context, listen: false)
+                    ..baslangictarih = DateTime(now.year, now.month, 1)
+                    ..bitistarih = DateTime(now.year, now.month + 1, 1);
+                } else if (index == 1) {
+                  Provider.of<Veriprovider>(context, listen: false)
+                    ..baslangictarih = DateTime(now.year, now.month - 1, 1)
+                    ..bitistarih = DateTime(now.year, now.month, 1);
+                } else if (index == 2) {
+                  Provider.of<Veriprovider>(context, listen: false)
+                    ..baslangictarih = DateTime(now.year, now.month - 2, 1)
+                    ..bitistarih = DateTime(now.year, now.month + 1, 1);
+                }
 
-                    Provider.of<Veriprovider>(
-                      context,
-                      listen: false,
-                    ).baslangictarih = DateTime(
-                      now.year,
-                      now.month,
-                      1,
-                    );
+                await Provider.of<Veriprovider>(
+                  context,
+                  listen: false,
+                ).gettumveries();
+                setState(() {
+                  selectedIndex = index;
+                });
+              },
 
-                    Provider.of<Veriprovider>(
-                      context,
-                      listen: false,
-                    ).bitistarih = DateTime(
-                      now.year,
-                      now.month + 1,
-                      1,
-                    );
-                  } else if (index == 1) {
-                    // Geçen ay
-
-                    Provider.of<Veriprovider>(
-                      context,
-                      listen: false,
-                    ).baslangictarih = DateTime(
-                      now.year,
-                      now.month - 1,
-                      1,
-                    );
-
-                    Provider.of<Veriprovider>(
-                      context,
-                      listen: false,
-                    ).bitistarih = DateTime(
-                      now.year,
-                      now.month,
-                      1,
-                    );
-                  } else {
-                    // Son 3 ay
-
-                    Provider.of<Veriprovider>(
-                      context,
-                      listen: false,
-                    ).baslangictarih = DateTime(
-                      now.year,
-                      now.month - 2,
-                      1,
-                    );
-
-                    Provider.of<Veriprovider>(
-                      context,
-                      listen: false,
-                    ).bitistarih = DateTime(
-                      now.year,
-                      now.month + 1,
-                      1,
-                    );
-                  }
-                  await Provider.of<Veriprovider>(
-                    context,
-                    listen: false,
-                  ).gettumveries();
-                  setState(() {
-                    selectedIndex = index;
-                  });
-                },
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: isSelected
-                        ? Theme.of(context).primaryColor
-                        : context.watch<AppTheme>().isdarkmode
-                        ? Theme.of(context).scaffoldBackgroundColor
-                        : Theme.of(context).secondaryHeaderColor,
-                    borderRadius: BorderRadius.only(
-                      topLeft: index == 0
-                          ? const Radius.circular(12)
-                          : Radius.zero,
-                      bottomLeft: index == 0
-                          ? const Radius.circular(12)
-                          : Radius.zero,
-                    ),
-                  ),
-                  alignment: Alignment.center,
-                  child: Text(
-                    labels[index],
+              itemBuilder: (context) => List.generate(
+                labels.length,
+                (index) =>
+                    PopupMenuItem(value: index, child: Text(labels[index])),
+              ),
+              child: Row(
+                children: [
+                  Text(
+                    labels[selectedIndex],
                     style: TextStyle(
-                      color: isSelected
-                          ? !Provider.of<AppTheme>(
-                                  context,
-                                  listen: false,
-                                ).isdarkmode
-                                ? Colors.white
-                                : Colors.black
-                          : Theme.of(context).textTheme.bodyLarge!.color,
                       fontWeight: FontWeight.w500,
+                      color: Theme.of(context).primaryColor,
                     ),
                   ),
-                ),
-              ),
-            );
-          }),
-
-          ...List.generate(labels.length - 1, (index) {
-            return Positioned(
-              left: (index + 1) * (MediaQuery.of(context).size.width - 40) / 4,
-              top: 8,
-              bottom: 8,
-              child: Container(width: 1, color: Theme.of(context).primaryColor),
-            );
-          }),
-
-          Container(
-            width: 44,
-            decoration: BoxDecoration(
-              color: context.watch<AppTheme>().isdarkmode
-                  ? Theme.of(context).scaffoldBackgroundColor
-                  : Theme.of(context).secondaryHeaderColor,
-              borderRadius: BorderRadius.only(
-                topRight: Radius.circular(12),
-                bottomRight: Radius.circular(12),
-              ),
-            ),
-            child: Theme(
-              data: Theme.of(context).copyWith(
-                popupMenuTheme: PopupMenuThemeData(
-                  color: Theme.of(
-                    context,
-                  ).scaffoldBackgroundColor, // Menü arka planı
-                ),
-              ),
-              child: PopupMenuButton<String>(
-                icon: Icon(
-                  Icons.more_vert,
-                  color: Theme.of(context).primaryColor,
-                ),
-                itemBuilder: (context) => [
-                  PopupMenuItem(
-                    padding: EdgeInsets.only(left: 20, right: 20),
-                    value: 'sil',
-                    child: Row(
-                      spacing: 5,
-                      children: [
-                        Icon(
-                          Icons.delete_forever,
-                          color: Theme.of(context).primaryColor,
-                        ),
-                        Text(
-                          'Tüm kayıtları sil',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      ],
-                    ),
-                  ),
-                  PopupMenuItem(
-                    padding: EdgeInsets.only(left: 20, right: 20),
-                    value: 'paylas',
-                    child: Row(
-                      spacing: 5,
-                      children: [
-                        Icon(
-                          Icons.picture_as_pdf,
-                          color: Theme.of(context).primaryColor,
-                        ),
-                        Text(
-                          'Verileri Yazdir',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      ],
-                    ),
-                  ),
-                  PopupMenuItem(
-                    padding: EdgeInsets.only(left: 20, right: 20),
-                    value: 'analiz',
-                    child: Row(
-                      spacing: 5,
-                      children: [
-                        Icon(
-                          Icons.analytics,
-                          color: Theme.of(context).primaryColor,
-                        ),
-                        Text(
-                          'Analiz olustur',
-                          style: Theme.of(context).textTheme.bodyMedium,
-                        ),
-                      ],
-                    ),
+                  Icon(
+                    Icons.arrow_drop_down,
+                    color: Theme.of(context).primaryColor,
+                    size: 30,
                   ),
                 ],
-                onSelected: (value) async {
-                  if (value == 'sil') {
-                    showDialog(
-                      context: context,
-                      builder: (context) => Dialog(
-                        backgroundColor: Theme.of(
-                          context,
-                        ).scaffoldBackgroundColor,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(20),
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Center(
-                                child: Text(
-                                  '${DateFormat('dd/mm/yyyy').format(baslangictarih)}-${DateFormat('dd/mm/yyyy').format(bitistarih)} arasi kayitlar silinecektir ,\nonayliyor musunuz?',
-                                  style: Theme.of(context).textTheme.bodyMedium,
-                                ),
-                              ),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  TextButton(
-                                    onPressed: () {
-                                      Navigator.pop(context);
-                                    },
-                                    child: Text(
-                                      'Iptal',
-
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.bodyMedium,
-                                    ),
-                                  ),
-                                  TextButton(
-                                    onPressed: () async {
-                                      await Provider.of<Veriprovider>(
-                                        context,
-                                        listen: false,
-                                      ).deletealldata();
-                                      Navigator.pop(context);
-                                      setState(() {});
-                                    },
-                                    child: Text(
-                                      'Devam',
-                                      style: Theme.of(
-                                        context,
-                                      ).textTheme.bodyMedium,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  } else if (value == 'paylas') {
-                    await pdfolustur();
-                  } else if (value == 'analiz') {
-                    context.push(Paths.analizsayfasi);
-                  }
-                },
               ),
             ),
-          ),
-        ],
-      ),
+
+            // Sağda üç nokta menüsü
+            PopupMenuButton<String>(
+              icon: Icon(
+                Icons.more_vert,
+                color: Theme.of(context).primaryColor,
+              ),
+              onSelected: (value) async {
+                if (value == 'sil') {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: Text('Uyarı'),
+                      content: Text(
+                        '${DateFormat('dd/MM/yyyy').format(baslangictarih)} - ${DateFormat('dd/MM/yyyy').format(bitistarih)} arası kayıtlar silinecek. Onaylıyor musunuz?',
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () => Navigator.pop(context),
+                          child: const Text('İptal'),
+                        ),
+                        TextButton(
+                          onPressed: () async {
+                            await Provider.of<Veriprovider>(
+                              context,
+                              listen: false,
+                            ).deletealldata();
+                            Navigator.pop(context);
+                            setState(() {});
+                          },
+                          child: const Text('Devam'),
+                        ),
+                      ],
+                    ),
+                  );
+                } else if (value == 'paylas') {
+                  await pdfolustur();
+                } else if (value == 'analiz') {
+                  context.push(Paths.analizsayfasi);
+                }
+              },
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: 'sil',
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.delete_forever,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      SizedBox(width: 8),
+                      Text('Tüm kayıtları sil'),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'paylas',
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.picture_as_pdf,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      SizedBox(width: 8),
+                      Text('Verileri yazdır'),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  value: 'analiz',
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.analytics,
+                        color: Theme.of(context).primaryColor,
+                      ),
+                      SizedBox(width: 8),
+                      Text('Analiz oluştur'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
     );
   }
 

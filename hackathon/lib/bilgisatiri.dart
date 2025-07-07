@@ -19,27 +19,16 @@ class Bilgisatiri extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: context.watch<AppTheme>().isdarkmode
-            ? Theme.of(context).scaffoldBackgroundColor
-            : Theme.of(context).secondaryHeaderColor,
-        border: aynitarihmi
-            ? Border.symmetric(
-                vertical: BorderSide(
-                  width: 0.4,
-                  color: Theme.of(context).primaryColor,
-                ),
-              )
-            : Border.all(width: 0.4, color: Theme.of(context).primaryColor),
-      ),
-      child: Column(
-        children: [
-          _islemSatiri(hareket: hareket, context: context),
-          const SizedBox(height: 10),
-        ],
-      ),
+    return buildCard(
+      children: [
+        Column(
+          children: [
+            _islemSatiri(hareket: hareket, context: context),
+            const SizedBox(height: 10),
+          ],
+        ),
+      ],
+      context: context,
     );
   }
 
@@ -59,14 +48,12 @@ class Bilgisatiri extends StatelessWidget {
         // Tarih
         SizedBox(
           width: 50,
-          child: !aynitarihmi
-              ? Column(
-                  children: [
-                    Text(gun, style: Theme.of(context).textTheme.titleLarge),
-                    Text(ay, style: Theme.of(context).textTheme.bodyMedium),
-                  ],
-                )
-              : const SizedBox(),
+          child: Column(
+            children: [
+              Text(gun, style: Theme.of(context).textTheme.titleLarge),
+              Text(ay, style: Theme.of(context).textTheme.bodyMedium),
+            ],
+          ),
         ),
         const SizedBox(width: 8),
 
@@ -122,6 +109,30 @@ class Bilgisatiri extends StatelessWidget {
           ],
         ),
       ],
+    );
+  }
+
+  Widget buildCard({
+    required List<Widget> children,
+    required BuildContext context,
+  }) {
+    return Card(
+      color:  Theme.of(context).secondaryHeaderColor,
+      shape: context.watch<AppTheme>().isdarkmode
+          ? RoundedRectangleBorder(
+              side: BorderSide(
+                color: Theme.of(context).primaryColor, // Kenarlık rengi
+                width: 1, // Kenarlık kalınlığı
+              ),
+              borderRadius: BorderRadius.circular(10),
+            )
+          : null,
+
+      margin: EdgeInsets.symmetric(vertical: 8),
+      child: Padding(
+        padding: EdgeInsets.all(12),
+        child: Column(mainAxisSize: MainAxisSize.min, children: children),
+      ),
     );
   }
 }

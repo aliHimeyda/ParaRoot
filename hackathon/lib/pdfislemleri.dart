@@ -11,7 +11,7 @@ class Pdfislemleri {
     List<Map<String, dynamic>?> veriListesi, {
     String faturaNo = "123-456-7890",
   }) async {
-    String ayYil = DateFormat('dd/mm/yyyy').format(DateTime.now()).toString();
+    String ayYil = DateFormat('dd/MM/yyyy').format(DateTime.now()).toString();
     final pdf = pw.Document();
     final baseColor = PdfColor.fromHex('#005C78');
     final accentColor = PdfColor.fromHex('#E88D67');
@@ -122,7 +122,7 @@ class Pdfislemleri {
                     final tur = item!['gidermi']?.toString() == "false"
                         ? '+'
                         : '-';
-                    final int price = item['deger'];
+                    final int price = (item['deger'] ?? 0) as int;
 
                     if (tur == '+') toplamGelir += price;
                     if (tur == '-') toplamGider += price;

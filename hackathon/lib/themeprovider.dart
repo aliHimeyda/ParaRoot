@@ -56,6 +56,9 @@ class AppTheme extends ChangeNotifier {
 
   /// **Açık Tema (Light Mode)**
   static final ThemeData lightMode = ThemeData(
+    popupMenuTheme: PopupMenuThemeData(
+      color: Color.fromARGB(255, 230, 234, 222), // Arka plan rengi
+    ),
     brightness: Brightness.light, // Tema parlaklığını açık mod olarak ayarlar
     primaryColor: const Color(0xFF005C78), // Uygulamanın ana rengini belirler
     secondaryHeaderColor: Color.fromARGB(255, 230, 234, 222), // turuncumsu
@@ -172,9 +175,12 @@ class AppTheme extends ChangeNotifier {
 
   /// **Koyu Tema (Dark Mode)**
   static final ThemeData darkMode = ThemeData(
+    popupMenuTheme: PopupMenuThemeData(
+      color: Colors.black, // Arka plan rengi
+    ),
     brightness: Brightness.dark,
     primaryColor: AppColors.sari, // Koyu mavi - Ana Renk
-    secondaryHeaderColor: Color.fromARGB(200, 232, 142, 103), // turuncumsu,
+    secondaryHeaderColor: Colors.black, // turuncumsu,
     cardColor: Color.fromARGB(146, 255, 166, 128),
     canvasColor: const Color.fromARGB(71, 232, 142, 103),
     scaffoldBackgroundColor: AppColors.siyah, // Siyah arka plan
